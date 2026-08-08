@@ -1,0 +1,12 @@
+{
+  "id": "agent-base",
+  "version": "1.0.0",
+  "name": "AI Agent Base",
+  "description": "A base devcontainer with common AI agent CLIs sharing a single agent config folder.",
+  "documentationURL": "https://github.com/docker-x/devcontainer",
+  "license": "MIT",
+  "platforms": ["Any"],
+  "optionalPaths": [
+    "^.devcontainer/devcontainer.json$"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "playwright",
+  "version": "1.0.0",
+  "name": "Playwright",
+  "description": "Install system dependencies for Playwright browser automation.",
+  "documentationURL": "https://playwright.dev",
+  "license": "MIT",
+  "keywords": [
+    "playwright",
+    "testing",
+    "browser",
+    "automation",
+    "e2e"
+  ],
+  "options": {
+    "browsers": {
+      "type": "string",
+      "enum": [
+        "all",
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "default": "chromium",
+      "description": "Which browser engines to install system dependencies for"
+    },
+    "installMethod": {
+      "type": "string",
+      "enum": [
+        "auto",
+        "system"
+      ],
+      "default": "auto",
+      "description": "Installation method. 'auto' lets Playwright manage browser binaries via npx, 'system' installs system dependencies only"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node"
+  ]
+}

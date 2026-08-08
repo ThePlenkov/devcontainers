@@ -1,0 +1,28 @@
+{
+  "id": "claude",
+  "version": "1.0.0",
+  "name": "Anthropic Claude",
+  "description": "Configure Anthropic Claude SDK and share the agent config folder with other agents.",
+  "documentationURL": "https://docs.anthropic.com",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "claude",
+    "anthropic",
+    "llm"
+  ],
+  "options": {
+    "apiKey": {
+      "type": "string",
+      "default": "",
+      "description": "Anthropic API key (or set ANTHROPIC_API_KEY env var)"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainer/agent-config": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/docker-x/devcontainer/agent-config"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "gascity",
+  "version": "1.0.0",
+  "name": "Gas City",
+  "description": "Install and validate Gas City - AI agent orchestration platform.",
+  "documentationURL": "https://github.com/gastownhall/gascity",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "agents",
+    "orchestration",
+    "gas-city",
+    "devin"
+  ],
+  "options": {
+    "autoRegister": {
+      "type": "boolean",
+      "default": false,
+      "description": "Automatically register city with supervisor on container startup"
+    }
+  },
+  "entrypoint": "/usr/local/share/gascity/entrypoint.sh",
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainer/homebrew": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/docker-x/devcontainer/homebrew"
+  ]
+}

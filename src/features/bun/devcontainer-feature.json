@@ -1,0 +1,21 @@
+{
+  "id": "bun",
+  "version": "1.0.0",
+  "name": "Bun",
+  "description": "Install Bun JavaScript runtime via Homebrew.",
+  "documentationURL": "https://bun.sh",
+  "license": "MIT",
+  "keywords": [
+    "bun",
+    "javascript",
+    "runtime",
+    "typescript"
+  ],
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainer/homebrew": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/docker-x/devcontainer/homebrew"
+  ]
+}

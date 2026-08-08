@@ -1,0 +1,37 @@
+{
+  "id": "devin",
+  "version": "1.0.0",
+  "name": "Devin CLI",
+  "description": "Install Devin CLI for AI-powered development and share its config folder with other agents.",
+  "documentationURL": "https://devin.ai",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "devin",
+    "development",
+    "cli"
+  ],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version of Devin CLI to install (e.g. 'latest' or a release tag like '2026.8.18')"
+    },
+    "installMethod": {
+      "type": "string",
+      "enum": [
+        "script",
+        "binary"
+      ],
+      "default": "script",
+      "description": "Install Devin via the official install script or a direct binary tarball"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainer/agent-config": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/docker-x/devcontainer/agent-config"
+  ]
+}

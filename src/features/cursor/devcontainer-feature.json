@@ -1,0 +1,24 @@
+{
+  "id": "cursor",
+  "version": "1.0.0",
+  "name": "Cursor Agent CLI",
+  "description": "Install Cursor Agent CLI and share its config folder with other agents.",
+  "documentationURL": "https://cursor.com/cli",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "cursor",
+    "development",
+    "cli"
+  ],
+  "containerEnv": {
+    "CURSOR_CONFIG_DIR": "/usr/local/share/agent-config/cursor"
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainer/agent-config": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/docker-x/devcontainer/agent-config"
+  ]
+}

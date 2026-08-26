@@ -11,9 +11,9 @@
   ],
   "options": {
     "packages": {
-      "type": "array",
-      "default": [],
-      "description": "Array of Homebrew packages/formulae to install (e.g. [\"gastownhall/gascity/gascity\"])"
+      "type": "string",
+      "default": "",
+      "description": "Comma-separated list of Homebrew packages/formulae to install (e.g. \"gastownhall/gascity/gascity,kubectl\")"
     }
   },
   "installsAfter": [

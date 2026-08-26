@@ -4,20 +4,26 @@ set -e
 # Bun JavaScript Runtime Installation Script
 
 REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
-REMOTE_USER_HOME="${_REMOTE_USER_HOME:-/home/$REMOTE_USER}"
+HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
 
-echo "Installing Bun JavaScript runtime..."
+echo "Verifying Bun JavaScript runtime..."
+
+export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 
 if ! command -v bun &> /dev/null; then
-    echo "Installing Bun via official installer..."
-    su -s /bin/bash - "$REMOTE_USER" -c \
-        "export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\$PATH'; curl -fsSL https://bun.sh/install | bash"
+    echo "Bun not found; installing via Homebrew..."
+    if command -v brew &> /dev/null; then
+        su -s /bin/bash - "$REMOTE_USER" -c \
+            "export PATH='$HOMEBREW_PREFIX/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\$PATH'; brew install oven-sh/bun/bun"
+    else
+        echo "Error: Homebrew not found. The homebrew feature must be installed first." >&2
+        exit 1
+    fi
 fi
 
-# Source bun env to get the binary path
-BUN_BIN="$REMOTE_USER_HOME/.bun/bin/bun"
-if [ -x "$BUN_BIN" ]; then
-    ln -sf "$BUN_BIN" /usr/local/bin/bun
+# Expose bun binary globally
+if [ -x "$HOMEBREW_PREFIX/bin/bun" ]; then
+    ln -sf "$HOMEBREW_PREFIX/bin/bun" /usr/local/bin/bun
 fi
 
 echo "Bun installed successfully!"

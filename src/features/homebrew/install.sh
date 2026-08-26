@@ -39,6 +39,12 @@ chmod +x /etc/profile.d/homebrew.sh
 
 export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 
+# Fix: brew wrapper script uses readlink which may not be in PATH
+# when invoked via su. Create a symlink in the brew bin directory.
+if [ -x /usr/bin/readlink ] && [ ! -e "$HOMEBREW_PREFIX/bin/readlink" ]; then
+    ln -sf /usr/bin/readlink "$HOMEBREW_PREFIX/bin/readlink"
+fi
+
 # Install requested packages
 if [ -n "$PACKAGES" ]; then
     # Parse packages: try JSON array first, then comma-separated string

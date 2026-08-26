@@ -52,11 +52,11 @@ if [ -n "$PACKAGES" ]; then
         [ -z "$pkg" ] && continue
         echo "Installing Homebrew package: $pkg"
         su -s /bin/bash - "$REMOTE_USER" -c \
-            "export PATH='$HOMEBREW_PREFIX/bin:\$PATH'; brew install '$pkg' || brew upgrade '$pkg'"
+            "export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOMEBREW_PREFIX/bin:\$PATH'; brew install '$pkg' || brew upgrade '$pkg'"
 
         # Symlink formula binaries to /usr/local/bin for global access
         prefix=$(su -s /bin/bash - "$REMOTE_USER" -c \
-            "export PATH='$HOMEBREW_PREFIX/bin:\$PATH'; brew --prefix '$pkg' 2>/dev/null" || true)
+            "export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOMEBREW_PREFIX/bin:\$PATH'; brew --prefix '$pkg' 2>/dev/null" || true)
         if [ -n "$prefix" ] && [ -d "$prefix/bin" ]; then
             for bin_file in "$prefix/bin"/*; do
                 if [ -x "$bin_file" ]; then

@@ -4,7 +4,6 @@
   "name": "Bun",
   "description": "Install Bun JavaScript runtime via Homebrew.",
   "documentationURL": "https://bun.sh",
-  "license": "MIT",
   "keywords": [
     "bun",
     "javascript",
@@ -17,5 +16,6 @@
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils",
     "ghcr.io/docker-x/devcontainer/homebrew"
-  ]
+  ],
+  "options": {}
 }

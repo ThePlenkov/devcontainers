@@ -4,7 +4,6 @@
   "name": "Playwright",
   "description": "Install system dependencies for Playwright browser automation.",
   "documentationURL": "https://playwright.dev",
-  "license": "MIT",
   "keywords": [
     "playwright",
     "testing",

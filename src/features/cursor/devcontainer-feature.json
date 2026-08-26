@@ -4,7 +4,6 @@
   "name": "Cursor Agent CLI",
   "description": "Install Cursor Agent CLI and share its config folder with other agents.",
   "documentationURL": "https://cursor.com/cli",
-  "license": "MIT",
   "keywords": [
     "ai",
     "cursor",
@@ -20,5 +19,6 @@
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils",
     "ghcr.io/docker-x/devcontainer/agent-config"
-  ]
+  ],
+  "options": {}
 }

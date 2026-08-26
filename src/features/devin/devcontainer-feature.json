@@ -4,7 +4,6 @@
   "name": "Devin CLI",
   "description": "Install Devin CLI for AI-powered development and share its config folder with other agents.",
   "documentationURL": "https://devin.ai",
-  "license": "MIT",
   "keywords": [
     "ai",
     "devin",

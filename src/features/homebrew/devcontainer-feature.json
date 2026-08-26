@@ -4,7 +4,6 @@
   "name": "Homebrew",
   "description": "Install Homebrew on Linux with optional packages and expose binaries to /usr/local/bin.",
   "documentationURL": "https://docs.brew.sh/Homebrew-on-Linux",
-  "license": "BSD-2-Clause",
   "keywords": [
     "package-manager",
     "homebrew",

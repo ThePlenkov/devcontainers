@@ -4,7 +4,6 @@
   "name": "Kilo CLI",
   "description": "Install the Kilo CLI and its dependencies, sharing the agent config folder with other agents.",
   "documentationURL": "https://kilocode.ai",
-  "license": "MIT",
   "keywords": [
     "ai",
     "kilo",
@@ -17,5 +16,6 @@
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils",
     "ghcr.io/docker-x/devcontainer/homebrew"
-  ]
+  ],
+  "options": {}
 }

@@ -4,7 +4,6 @@
   "name": "Anthropic Claude",
   "description": "Configure Anthropic Claude SDK and share the agent config folder with other agents.",
   "documentationURL": "https://docs.anthropic.com",
-  "license": "MIT",
   "keywords": [
     "ai",
     "claude",

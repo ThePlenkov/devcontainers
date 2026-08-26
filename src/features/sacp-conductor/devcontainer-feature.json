@@ -4,7 +4,6 @@
   "name": "sacp-conductor",
   "description": "Install sacp-conductor for ACP proxy orchestration.",
   "documentationURL": "https://crates.io/crates/sacp-conductor",
-  "license": "MIT",
   "keywords": [
     "acp",
     "sacp",
@@ -13,5 +12,6 @@
   ],
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils"
-  ]
+  ],
+  "options": {}
 }

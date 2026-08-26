@@ -4,7 +4,6 @@
   "name": "Shared Agent Config",
   "description": "Creates a shared directory for AI agent configuration and exposes it as AGENT_CONFIG_DIR so multiple agent features can store their configs in one place.",
   "documentationURL": "https://github.com/docker-x/devcontainer#agent-config",
-  "license": "MIT",
   "keywords": [
     "ai",
     "agents",
@@ -16,5 +15,6 @@
   },
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils"
-  ]
+  ],
+  "options": {}
 }

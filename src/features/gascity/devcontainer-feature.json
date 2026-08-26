@@ -4,7 +4,6 @@
   "name": "Gas City",
   "description": "Install and validate Gas City - AI agent orchestration platform.",
   "documentationURL": "https://github.com/gastownhall/gascity",
-  "license": "MIT",
   "keywords": [
     "ai",
     "agents",

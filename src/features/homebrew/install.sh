@@ -12,7 +12,7 @@ echo "Installing Homebrew for user: $REMOTE_USER..."
 # Ensure dependencies are present
 if command -v apt-get >/dev/null 2>&1; then
     apt-get update -y
-    apt-get install -y curl ca-certificates git jq procps
+    apt-get install -y curl ca-certificates git jq procps coreutils
     rm -rf /var/lib/apt/lists/*
 fi
 
@@ -41,9 +41,15 @@ export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 
 # Install requested packages
 if [ -n "$PACKAGES" ]; then
-    PACKAGE_LIST=$(echo "$PACKAGES" | jq -r '.[]' 2>/dev/null || echo "$PACKAGES" | tr -d '[]",')
+    # Parse packages: try JSON array first, then comma-separated string
+    if echo "$PACKAGES" | jq -r '.[]' 2>/dev/null | grep -q .; then
+        PACKAGE_LIST=$(echo "$PACKAGES" | jq -r '.[]')
+    else
+        PACKAGE_LIST=$(echo "$PACKAGES" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    fi
 
     for pkg in $PACKAGE_LIST; do
+        [ -z "$pkg" ] && continue
         echo "Installing Homebrew package: $pkg"
         su -s /bin/bash - "$REMOTE_USER" -c \
             "export PATH='$HOMEBREW_PREFIX/bin:\$PATH'; brew install '$pkg' || brew upgrade '$pkg'"

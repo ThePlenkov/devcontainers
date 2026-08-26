@@ -1,8 +1,8 @@
 {
   "id": "bun",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Bun",
-  "description": "Install Bun JavaScript runtime via Homebrew.",
+  "description": "Install Bun JavaScript runtime via official installer.",
   "documentationURL": "https://bun.sh",
   "keywords": [
     "bun",

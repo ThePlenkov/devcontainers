@@ -1,6 +1,6 @@
 {
   "id": "gascity",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Gas City",
   "description": "Install and validate Gas City - AI agent orchestration platform.",
   "documentationURL": "https://github.com/gastownhall/gascity",

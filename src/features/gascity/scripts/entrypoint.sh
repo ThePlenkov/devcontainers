@@ -31,3 +31,11 @@ if [ "${AUTOREGISTER}" = "true" ]; then
 else
     echo "Auto-register skipped"
 fi
+
+# Execute the main container command (or keep alive if none)
+if [ $# -gt 0 ]; then
+    exec "$@"
+else
+    # Keep the container alive when no command is provided
+    exec sleep infinity
+fi

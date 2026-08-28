@@ -22,7 +22,7 @@ fi
 if ! command -v gc &> /dev/null; then
     echo "Gas City not found; installing via Homebrew..."
     su -s /bin/bash - "$REMOTE_USER" -c \
-        "export PATH='$HOMEBREW_PREFIX/bin:\$PATH'; brew install gastownhall/gascity/gascity"
+        "export PATH='$HOMEBREW_PREFIX/bin:\$PATH'; brew install gastownhall/gascity/gascity || true"
 fi
 
 export PATH="$HOMEBREW_PREFIX/bin:$PATH"

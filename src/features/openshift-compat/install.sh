@@ -9,13 +9,14 @@ set -e
 #   - /etc/passwd & /etc/group group-writable for runtime UID fix
 #   - /home/vscode group-writable (root group) for random UIDs
 #   - Fake sudo wrapper (OpenShift blocks real sudo)
-#   - DevPod agent binary pre-install (optional)
 #   - Entrypoint script installed to /usr/local/bin/entrypoint.sh
+#
+# Agent binary pre-install (Devsy/DevPod) is handled by the separate
+# devsy and devpod features.
 
 SSH_PORT="${SSHPORT:-2222}"
-INSTALL_DEVPOD_AGENT="${INSTALLDEVPODAGENT:-true}"
 
-echo "openshift-compat: configuring for SSH port ${SSH_PORT}, devpod agent: ${INSTALL_DEVPOD_AGENT}"
+echo "openshift-compat: configuring for SSH port ${SSH_PORT}"
 
 # --- Install openssh-server ---
 if ! command -v sshd &> /dev/null; then
@@ -138,35 +139,12 @@ fi
 SUDOEOF
 chmod +x /usr/local/bin/sudo
 
-# --- Pre-install DevPod agent binary ---
-if [ "$INSTALL_DEVPOD_AGENT" = "true" ]; then
-  echo "openshift-compat: pre-installing DevPod agent binary"
-  # Ensure curl and tar are available (base image may not have them)
-  if ! command -v curl >/dev/null 2>&1; then
-    apt-get update -y && apt-get install -y curl tar && rm -rf /var/lib/apt/lists/*
-  fi
-  mkdir -p /home/vscode/.local/bin
-  DEVPOD_URL="https://github.com/loft-sh/devpod/releases/latest/download/devpod_Linux_x86_64.tar.gz"
-  curl -fsSL "$DEVPOD_URL" -o /tmp/devpod.tar.gz
-  tar -xzf /tmp/devpod.tar.gz -C /tmp devpod 2>/dev/null || tar -xzf /tmp/devpod.tar.gz -C /tmp 2>/dev/null || true
-  if [ -f /tmp/devpod ]; then
-    mv /tmp/devpod /home/vscode/.local/bin/devpod
-  elif [ -f /tmp/devpod-linux-amd64 ]; then
-    mv /tmp/devpod-linux-amd64 /home/vscode/.local/bin/devpod
-  fi
-  rm -f /tmp/devpod.tar.gz
-  chmod 755 /home/vscode/.local/bin/devpod 2>/dev/null || true
-  chgrp -R 0 /home/vscode/.local 2>/dev/null || true
-  chmod -R g+rwX /home/vscode/.local 2>/dev/null || true
-  echo "openshift-compat: DevPod agent installed to /home/vscode/.local/bin/devpod"
-fi
-
 # --- Install entrypoint.sh ---
 cat > /usr/local/bin/entrypoint.sh << 'ENTRYEOF'
 #!/bin/bash
 set -e
 
-# OpenShift entrypoint for DevPod SSH provider.
+# OpenShift entrypoint for SSH-based workspace providers.
 # Adjusts the vscode user UID to match the OpenShift-assigned random UID,
 # sets up SSH, starts sshd, and keeps the container alive.
 # Optionally starts the Paseo daemon if the paseo command is available.

@@ -13,11 +13,7 @@ AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/openclaw"
 
 echo "Installing OpenClaw CLI (version: ${VERSION})..."
 
-# Install curl and npm if not available
-if ! command -v curl &> /dev/null; then
-    apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-fi
-
+# Install npm if not available (openclaw is installed via npm, not curl)
 if ! command -v npm &> /dev/null; then
     echo "Error: npm is required to install OpenClaw CLI. Add the node feature before this one." >&2
     exit 1
@@ -41,12 +37,16 @@ if [[ ! -x "$OPENCLAW_BIN" ]]; then
     exit 1
 fi
 
-ln -sf "$OPENCLAW_BIN" /usr/local/bin/openclaw
+if [[ -n "$OPENCLAW_BIN" && "$OPENCLAW_BIN" != "/usr/local/bin/openclaw" ]]; then
+    ln -sf "$OPENCLAW_BIN" /usr/local/bin/openclaw
+fi
 echo "OpenClaw CLI linked to /usr/local/bin/openclaw"
 
 # Profile.d for login shells
-cat > /etc/profile.d/openclaw.sh << 'EOF'
-export OPENCLAW_STATE_DIR="${OPENCLAW_STATE_DIR:-$HOME/.openclaw}"
+# Use REMOTE_USER_HOME (resolved at build time) instead of $HOME, which may be
+# set to "/" on OpenShift restricted SCC.
+cat > /etc/profile.d/openclaw.sh << EOF
+export OPENCLAW_STATE_DIR="\${OPENCLAW_STATE_DIR:-$REMOTE_USER_HOME/.openclaw}"
 EOF
 chmod 0755 /etc/profile.d/openclaw.sh
 

@@ -32,6 +32,14 @@ npm rebuild -g @charmland/crush 2>&1 || { echo "Error: crush native binary setup
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
 CRUSH_BIN="$NPM_GLOBAL_BIN/crush"
 
+# Verify native binary exists (not just the npm wrapper)
+if [[ -x "$NPM_GLOBAL_BIN/crush" ]]; then
+    if ! "$NPM_GLOBAL_BIN/crush" --version >/dev/null 2>&1; then
+        echo "Error: crush native binary not functional" >&2
+        exit 1
+    fi
+fi
+
 if [[ -x "$CRUSH_BIN" ]]; then
     if [[ -n "$CRUSH_BIN" && "$CRUSH_BIN" != "/usr/local/bin/crush" ]]; then
         ln -sf "$CRUSH_BIN" /usr/local/bin/crush

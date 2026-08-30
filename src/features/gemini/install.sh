@@ -25,7 +25,7 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts @google/gemini-cli@"${VERSION}"
 fi
-npm rebuild -g @google/gemini-cli 2>/dev/null || true
+npm rebuild -g @google/gemini-cli 2>&1 || { echo "Error: gemini native binary setup failed" >&2; exit 1; }
 
 # Locate and link the binary to /usr/local/bin
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
@@ -52,7 +52,11 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
     if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.gemini"
         if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
-            mv "$target" "$AGENT_DIR/config-legacy"
+            LEGACY_DIR="$AGENT_DIR/config-legacy"
+            if [[ -e "$LEGACY_DIR" ]]; then
+                LEGACY_DIR="$AGENT_DIR/config-legacy-$(date +%s)"
+            fi
+            mv "$target" "$LEGACY_DIR"
         fi
         parent=$(dirname "$target")
         mkdir -p "$parent"

@@ -22,6 +22,10 @@ if ! command -v curl &> /dev/null; then
     apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 fi
 
+# Set HERMES_HOME to the remote user's home so the installer places files
+# in the PVC-backed home directory (not / when HOME=/ on OpenShift).
+export HERMES_HOME="${REMOTE_USER_HOME:-/home/vscode}/.hermes"
+
 # Run the upstream Hermes installer (non-interactive, skip initial setup)
 # Download-then-execute instead of curl|bash (review finding)
 curl --proto =https --proto-redir =https -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$TMP_DIR/hermes-install.sh"
@@ -53,8 +57,10 @@ chmod +x /usr/local/bin/hermes
 echo "Hermes CLI linked to /usr/local/bin/hermes"
 
 # Profile.d for login shells
-cat > /etc/profile.d/hermes.sh << 'EOF'
-export HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+# Use REMOTE_USER_HOME (resolved at build time) instead of $HOME, which may be
+# set to "/" on OpenShift restricted SCC.
+cat > /etc/profile.d/hermes.sh << EOF
+export HERMES_HOME="\${HERMES_HOME:-$REMOTE_USER_HOME/.hermes}"
 EOF
 chmod 0755 /etc/profile.d/hermes.sh
 

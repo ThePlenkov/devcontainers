@@ -74,7 +74,8 @@ case "$INSTALL_METHOD" in
             OPENCODE_BIN="$HOME/.local/bin/opencode"
         fi
         if [[ -x "$OPENCODE_BIN" ]] && [[ "$(readlink -f "$OPENCODE_BIN")" != "/usr/local/bin/opencode" ]]; then
-            ln -sf "$OPENCODE_BIN" /usr/local/bin/opencode
+            cp "$OPENCODE_BIN" /usr/local/bin/opencode
+            chmod +x /usr/local/bin/opencode
         fi
         echo "OpenCode linked to /usr/local/bin/opencode"
         ;;

@@ -105,7 +105,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
     if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.config/cagent"
         if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
-            mv "$target" "$AGENT_DIR/config-legacy"
+            mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
         fi
         parent=$(dirname "$target")
         mkdir -p "$parent"
@@ -123,7 +123,7 @@ fi
 # Verify installation
 set +e
 if command -v docker-agent >/dev/null 2>&1; then
-    OUT=$(docker-agent --version 2>&1)
+    OUT=$(docker-agent version 2>&1)
     RC=$?
     if [[ $RC -eq 0 ]]; then
         echo "Docker Agent CLI version: ${OUT}"

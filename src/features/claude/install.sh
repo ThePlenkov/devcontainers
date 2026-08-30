@@ -43,11 +43,16 @@ fi
 
 # Clean up old symlinks from previous always-on shareConfig behavior
 if [[ "$SHARE_CONFIG" != "true" ]]; then
-    for old_target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
-        if [[ -L "$old_target" ]]; then
-            rm -f "$old_target"
-        fi
-    done
+    if [[ -n "$REMOTE_USER_HOME" ]] && [[ -d "$REMOTE_USER_HOME" ]]; then
+        for old_target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
+            if [[ -L "$old_target" ]]; then
+                link_dest=$(readlink "$old_target" 2>/dev/null || true)
+                if [[ "$link_dest" == "$AGENT_DIR"* ]]; then
+                    rm -f "$old_target"
+                fi
+            fi
+        done
+    fi
 fi
 
 # Usage examples

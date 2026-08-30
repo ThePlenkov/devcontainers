@@ -31,19 +31,18 @@ else
 fi
 npm rebuild -g @moonshot-ai/kimi-code 2>/dev/null || true
 
-# Locate the installed binary and copy it to /usr/local/bin
-KIMI_BIN="$(command -v kimi || true)"
-if [[ -z "$KIMI_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    KIMI_BIN="$NPM_GLOBAL_BIN/kimi"
-fi
+# Locate the installed binary from npm's global bin directory (not PATH)
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+KIMI_BIN="$NPM_GLOBAL_BIN/kimi"
 
 if [[ ! -x "$KIMI_BIN" ]]; then
     echo "Kimi Code CLI installation failed: binary not found at $KIMI_BIN" >&2
     exit 1
 fi
 
-ln -sf "$KIMI_BIN" /usr/local/bin/kimi
+if [[ -n "$KIMI_BIN" && "$KIMI_BIN" != "/usr/local/bin/kimi" ]]; then
+    ln -sf "$KIMI_BIN" /usr/local/bin/kimi
+fi
 echo "Kimi Code CLI linked to /usr/local/bin/kimi"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled

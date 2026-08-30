@@ -31,6 +31,11 @@ export HOME="${REMOTE_USER_HOME:-/home/vscode}"
 # it as a positional version and rejects it. Pinned versions are not supported.
 bash "$TMP_DIR/grok-install.sh"
 
+# Ensure the .grok tree is owned by the remote user (not root) when non-root
+if id -u "$REMOTE_USER" >/dev/null 2>&1 && [[ "$REMOTE_USER" != "root" ]]; then
+    chown -R "$REMOTE_USER:" "$HOME/.grok" 2>/dev/null || true
+fi
+
 # Locate the installed binary and link it to /usr/local/bin
 GROK_BIN="$(command -v grok || true)"
 if [[ -z "$GROK_BIN" ]]; then
@@ -75,6 +80,11 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         target="$REMOTE_USER_HOME/.grok"
         if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
+        fi
+        # Fix broken /usr/local/bin/grok after config migration
+        GROK_NEW_BIN=$(find "$AGENT_DIR" -name "grok" -type f -executable 2>/dev/null | head -1)
+        if [[ -n "$GROK_NEW_BIN" ]]; then
+            ln -sf "$GROK_NEW_BIN" /usr/local/bin/grok
         fi
         parent=$(dirname "$target")
         mkdir -p "$parent"

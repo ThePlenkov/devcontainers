@@ -57,6 +57,14 @@ else
     # shareConfig is false — remove any pre-existing profile.d script
     # so CURSOR_CONFIG_DIR is not set unconditionally.
     rm -f /etc/profile.d/cursor.sh
+
+    # Remove legacy ~/.cursor symlink if it points to this feature's AGENT_DIR
+    if [[ -L "$REMOTE_USER_HOME/.cursor" ]]; then
+        link_dest=$(readlink "$REMOTE_USER_HOME/.cursor" 2>/dev/null || true)
+        if [[ "$link_dest" == "$AGENT_DIR"* ]]; then
+            rm -f "$REMOTE_USER_HOME/.cursor"
+        fi
+    fi
 fi
 
 echo "Cursor Agent CLI installed successfully!"

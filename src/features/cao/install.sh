@@ -32,9 +32,10 @@ if ! command -v tmux &> /dev/null; then
     apt-get update -y && apt-get install -y tmux && rm -rf /var/lib/apt/lists/*
 fi
 # CAO requires tmux 3.3+; warn if the installed version is too old
-TMUX_VERSION=$(tmux -V 2>/dev/null | awk '{print $2}')
+TMUX_VERSION=$(tmux -V 2>/dev/null | awk '{print $2}' | grep -oE '^[0-9]+\.[0-9]+')
 if [[ -n "$TMUX_VERSION" ]] && [[ "$(echo "$TMUX_VERSION" | cut -d. -f1)" -lt 3 || ( "$(echo "$TMUX_VERSION" | cut -d. -f1)" -eq 3 && "$(echo "$TMUX_VERSION" | cut -d. -f2)" -lt 3 ) ]]; then
-    echo "Warning: CAO requires tmux 3.3+, found $TMUX_VERSION. Orchestration may fail." >&2
+    echo "Error: CAO requires tmux 3.3+, found $TMUX_VERSION." >&2
+    exit 1
 fi
 
 # Install uv if not present (required to install CAO)
@@ -47,7 +48,7 @@ if ! command -v uv &> /dev/null; then
     curl --proto =https --proto-redir =https -LsSf https://astral.sh/uv/install.sh -o "$UV_TMP_SCRIPT"
     sh "$UV_TMP_SCRIPT"
     # Add uv to PATH (installer with UV_INSTALL_DIR=/usr/local places uv in /usr/local/bin)
-    export PATH="/usr/local/bin:$PATH"
+    export PATH="/usr/local:/usr/local/bin:$PATH"
 fi
 
 # Determine the install ref (branch/tag)
@@ -60,7 +61,7 @@ fi
 
 # Install CAO via uv tool install
 # With UV_INSTALL_DIR=/usr/local, uv tools are installed to /usr/local/bin
-uv tool install --python auto "git+https://github.com/awslabs/cli-agent-orchestrator.git@${CAO_REF}" --upgrade
+uv tool install cao-cli --force
 
 # Locate the installed binary and link it to /usr/local/bin
 CAO_BIN="$(command -v cao || true)"

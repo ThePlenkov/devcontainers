@@ -25,6 +25,7 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts mastracode@"${VERSION}"
 fi
+npm rebuild -g mastracode 2>/dev/null || true
 
 # Locate the installed binary from npm's global bin directory (not PATH)
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
@@ -35,7 +36,9 @@ if [[ ! -x "$MASTRACODE_BIN" ]]; then
     exit 1
 fi
 
-ln -sf "$MASTRACODE_BIN" /usr/local/bin/mastracode
+if [[ -n "$MASTRACODE_BIN" && "$MASTRACODE_BIN" != "/usr/local/bin/mastracode" ]]; then
+    ln -sf "$MASTRACODE_BIN" /usr/local/bin/mastracode
+fi
 echo "Mastra Code CLI linked to /usr/local/bin/mastracode"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled

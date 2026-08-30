@@ -67,7 +67,7 @@ fi
 # Goose releases may not publish checksums.txt — warn and continue if absent.
 if curl --proto =https -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt" 2>/dev/null \
     && [[ -s "$TMP_DIR/checksums.txt" ]]; then
-    expected=$(grep "$TARBALL" "$TMP_DIR/checksums.txt" | awk '{print $1}')
+    expected=$(grep -E "^[a-f0-9]+[[:space:]]+${TARBALL}$" "$TMP_DIR/checksums.txt" | awk '{print $1}')
     if [[ -n "$expected" ]]; then
         actual=$(sha256sum "$TMP_DIR/goose.tar.gz" | awk '{print $1}')
         if [[ "$expected" != "$actual" ]]; then
@@ -109,7 +109,11 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
     if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.config/goose"
         if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
-            mv "$target" "$AGENT_DIR/config-legacy"
+            LEGACY_DIR="$AGENT_DIR/config-legacy"
+            if [[ -e "$LEGACY_DIR" ]]; then
+                LEGACY_DIR="$AGENT_DIR/config-legacy-$(date +%s)"
+            fi
+            mv "$target" "$LEGACY_DIR"
         fi
         parent=$(dirname "$target")
         mkdir -p "$parent"

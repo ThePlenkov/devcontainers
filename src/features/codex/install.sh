@@ -61,12 +61,25 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             rm -f "$target"
             if id -u "$REMOTE_USER" >/dev/null 2>&1; then
                 chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
             else
                 ln -sfn "$AGENT_DIR" "$target"
             fi
         done
     fi
+fi
+
+# Stale link cleanup when shareConfig is false: remove symlinks that point
+# to $AGENT_DIR from a previous shareConfig=true run.
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.codex" "$REMOTE_USER_HOME/.config/codex"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR"* ]]; then
+                rm -f "$old_target"
+            fi
+        fi
+    done
 fi
 
 # Verify installation (don't let version-check failures abort the build)

@@ -66,13 +66,13 @@ github_latest_tag() {
     local repo="$1"
     local tag=""
     set +e
-    tag="$(curl --proto =https -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
+    tag="$(curl --proto =https --proto-redir =https -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
         | jq -r '.tag_name // empty' 2>/dev/null)"
     set -e
     if [[ -z "$tag" ]]; then
         # Fallback: parse the redirect target of the /latest tag URL.
         set +e
-        tag="$(curl --proto =https -fsSLI -o /dev/null -w '%{url_effective}' \
+        tag="$(curl --proto =https --proto-redir =https -fsSLI -o /dev/null -w '%{url_effective}' \
             "https://github.com/${repo}/releases/latest" 2>/dev/null \
             | sed -n 's|.*/tag/\(.*\)|\1|p')"
         set -e
@@ -107,7 +107,7 @@ install_gascity() {
     echo "Installing Gas City ${tag} from ${url}..."
     local tmpdir; tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' RETURN
-    curl --proto =https -fsSL "$url" -o "$tmpdir/$asset"
+    curl --proto =https --proto-redir =https -fsSL "$url" -o "$tmpdir/$asset"
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
     if [[ ! -f "$tmpdir/gc" ]]; then
@@ -133,7 +133,7 @@ install_dolt() {
     echo "Installing Dolt ${tag} from ${url}..."
     local tmpdir; tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' RETURN
-    curl --proto =https -fsSL "$url" -o "$tmpdir/$asset"
+    curl --proto =https --proto-redir =https -fsSL "$url" -o "$tmpdir/$asset"
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
     # Dolt tarball layout: either ./bin/dolt or ./dolt
@@ -168,7 +168,7 @@ install_beads() {
     echo "Installing beads ${tag} from ${url}..."
     local tmpdir; tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' RETURN
-    curl --proto =https -fsSL "$url" -o "$tmpdir/$asset"
+    curl --proto =https --proto-redir =https -fsSL "$url" -o "$tmpdir/$asset"
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
     # beads tarball layout: either ./bd or ./bin/bd

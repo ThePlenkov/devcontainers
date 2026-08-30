@@ -30,7 +30,9 @@ fi
 
 # Expose bun binary globally on PATH for all users.
 if [[ -x "$BUN_INSTALL_DIR/bin/bun" ]]; then
-    ln -sf "$BUN_INSTALL_DIR/bin/bun" /usr/local/bin/bun
+    if [[ "$BUN_INSTALL_DIR/bin/bun" != "/usr/local/bin/bun" ]]; then
+        ln -sf "$BUN_INSTALL_DIR/bin/bun" /usr/local/bin/bun
+    fi
 else
     echo "Error: Bun binary not found at $BUN_INSTALL_DIR/bin/bun" >&2
     exit 1

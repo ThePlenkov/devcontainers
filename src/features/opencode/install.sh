@@ -34,15 +34,11 @@ case "$INSTALL_METHOD" in
         fi
         # Explicitly run postinstall to install native binaries
         npm rebuild -g opencode-ai 2>&1 || { echo "Error: opencode native binary setup failed" >&2; exit 1; }
-        # Copy binary to /usr/local/bin for system-wide access
-        OPENCODE_BIN="$(command -v opencode || true)"
-        if [[ -z "$OPENCODE_BIN" ]]; then
-            NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-            OPENCODE_BIN="$NPM_GLOBAL_BIN/opencode"
-            # If the candidate doesn't exist, try $HOME/.local/bin
-            if [[ ! -x "$OPENCODE_BIN" ]]; then
-                OPENCODE_BIN="${REMOTE_USER_HOME:-$HOME}/.local/bin/opencode"
-            fi
+        # Locate the installed binary from npm's global bin directory (not PATH)
+        NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+        OPENCODE_BIN="$NPM_GLOBAL_BIN/opencode"
+        if [[ ! -x "$OPENCODE_BIN" ]]; then
+            OPENCODE_BIN="${REMOTE_USER_HOME:-$HOME}/.local/bin/opencode"
         fi
         if [[ ! -x "$OPENCODE_BIN" ]]; then
             echo "OpenCode installation failed: binary not found at $OPENCODE_BIN" >&2

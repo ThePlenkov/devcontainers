@@ -61,7 +61,7 @@ fi
 
 # Install CAO via uv tool install
 # With UV_INSTALL_DIR=/usr/local, uv tools are installed to /usr/local/bin
-uv tool install cao-cli --force
+uv tool install "git+https://github.com/cao-ai/cao.git@${CAO_REF}" --force
 
 # Locate the installed binary and link it to /usr/local/bin
 CAO_BIN="$(command -v cao || true)"

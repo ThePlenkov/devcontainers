@@ -17,13 +17,14 @@ if [[ "$VERSION" = "latest" ]]; then
 else
     npm install -g --ignore-scripts @roo-code/bob-shell@"$VERSION"
 fi
-npm rebuild -g @roo-code/bob-shell 2>/dev/null || true
+npm rebuild -g @roo-code/bob-shell 2>&1 || { echo "Error: bob native binary setup failed" >&2; exit 1; }
 
-if command -v bob &> /dev/null; then
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+if [[ -x "$NPM_GLOBAL_BIN/bob" ]]; then
     echo "Bob Shell installed successfully!"
-    bob --version || true
+    "$NPM_GLOBAL_BIN/bob" --version || true
 else
-    echo "Warning: Bob Shell installation completed but 'bob' command not found in PATH" >&2
+    echo "Warning: Bob Shell installation completed but 'bob' command not found at $NPM_GLOBAL_BIN/bob" >&2
 fi
 
 # Shared agent config for Bob

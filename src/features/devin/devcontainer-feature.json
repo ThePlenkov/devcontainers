@@ -1,6 +1,6 @@
 {
   "id": "devin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Devin CLI",
   "description": "Install Devin CLI for AI-powered development and share its config folder with other agents.",
   "documentationURL": "https://devin.ai",
@@ -24,6 +24,11 @@
       ],
       "default": "script",
       "description": "Install Devin via the official install script or a direct binary tarball"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent's config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
     }
   },
   "dependsOn": {

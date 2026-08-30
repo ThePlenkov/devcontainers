@@ -1,6 +1,6 @@
 {
   "id": "bob",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Bob Shell",
   "description": "Install Bob Shell AI terminal assistant and share its config folder with other agents.",
   "documentationURL": "https://www.npmjs.com/package/@roo-code/bob-shell",
@@ -15,6 +15,11 @@
       "type": "string",
       "default": "latest",
       "description": "Version of Bob Shell to install"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent's config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
     }
   },
   "dependsOn": {

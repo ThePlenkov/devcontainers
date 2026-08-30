@@ -1,0 +1,36 @@
+{
+  "id": "crush",
+  "version": "1.0.0",
+  "name": "Crush CLI",
+  "description": "Install Crush from Charm — a terminal-first AI coding assistant that works with multiple LLM providers (Anthropic, OpenAI, Gemini, Groq, OpenRouter, Azure, AWS Bedrock).",
+  "documentationURL": "https://github.com/charmbracelet/crush",
+  "keywords": [
+    "ai",
+    "crush",
+    "charm",
+    "agent",
+    "cli",
+    "coding",
+    "terminal"
+  ],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version of Crush to install (npm package version or 'latest')"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink ~/.config/crush to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

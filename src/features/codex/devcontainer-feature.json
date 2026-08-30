@@ -1,15 +1,26 @@
 {
   "id": "codex",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "OpenAI Codex CLI",
   "description": "Install OpenAI Codex CLI - AI coding agent for terminal-based development.",
   "documentationURL": "https://github.com/openai/codex",
-  "keywords": ["ai", "openai", "codex", "agents", "cli"],
+  "keywords": [
+    "ai",
+    "openai",
+    "codex",
+    "agents",
+    "cli"
+  ],
   "options": {
     "version": {
       "type": "string",
       "default": "latest",
       "description": "Version of Codex CLI to install"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent's config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
     }
   },
   "dependsOn": {

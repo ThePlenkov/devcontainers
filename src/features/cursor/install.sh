@@ -7,6 +7,7 @@ REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
 REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/null | cut -d: -f6)}"
 REMOTE_USER_HOME="${REMOTE_USER_HOME:-$(eval echo ~$REMOTE_USER)}"
 AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/cursor"
+SHARE_CONFIG="${SHARECONFIG:-false}"
 
 echo "Installing Cursor Agent CLI for user $REMOTE_USER..."
 
@@ -33,17 +34,19 @@ for bin in agent cursor-agent; do
 done
 
 # Shared agent config for Cursor
-mkdir -p "$AGENT_DIR"
-if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-    chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
-fi
-
-if [ -d "$REMOTE_USER_HOME" ]; then
-    if [ -e "$REMOTE_USER_HOME/.cursor" ] && [ ! -L "$REMOTE_USER_HOME/.cursor" ]; then
-        mv "$REMOTE_USER_HOME/.cursor" "$AGENT_DIR/legacy-cursor"
+if [[ "$SHARE_CONFIG" == "true" ]]; then
+    mkdir -p "$AGENT_DIR"
+    if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+        chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
     fi
-    rm -f "$REMOTE_USER_HOME/.cursor"
-    su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$REMOTE_USER_HOME/.cursor'" 2>/dev/null || true
+
+    if [ -d "$REMOTE_USER_HOME" ]; then
+        if [ -e "$REMOTE_USER_HOME/.cursor" ] && [ ! -L "$REMOTE_USER_HOME/.cursor" ]; then
+            mv "$REMOTE_USER_HOME/.cursor" "$AGENT_DIR/legacy-cursor"
+        fi
+        rm -f "$REMOTE_USER_HOME/.cursor"
+        su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$REMOTE_USER_HOME/.cursor'" 2>/dev/null || true
+    fi
 fi
 
 # Make CURSOR_CONFIG_DIR available in login shells

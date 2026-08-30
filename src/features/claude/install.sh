@@ -8,6 +8,7 @@ REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
 REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/null | cut -d: -f6)}"
 REMOTE_USER_HOME="${REMOTE_USER_HOME:-$(eval echo ~$REMOTE_USER)}"
 AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/claude"
+SHARE_CONFIG="${SHARECONFIG:-false}"
 
 echo "Configuring Anthropic Claude..."
 
@@ -25,26 +26,28 @@ else
 fi
 
 # Shared agent config for Claude
-mkdir -p "$AGENT_DIR"
-if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-    chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
-fi
+if [[ "$SHARE_CONFIG" == "true" ]]; then
+    mkdir -p "$AGENT_DIR"
+    if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+        chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
+    fi
 
-if [ -d "$REMOTE_USER_HOME" ]; then
-    for target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
-            mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
-        fi
-        parent=$(dirname "$target")
-        mkdir -p "$parent"
-        rm -f "$target"
-        if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-            chown "$REMOTE_USER:$REMOTE_USER" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
-        else
-            ln -sfn "$AGENT_DIR" "$target"
-        fi
-    done
+    if [ -d "$REMOTE_USER_HOME" ]; then
+        for target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
+            if [ -e "$target" ] && [ ! -L "$target" ]; then
+                mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
+            fi
+            parent=$(dirname "$target")
+            mkdir -p "$parent"
+            rm -f "$target"
+            if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+                chown "$REMOTE_USER:$REMOTE_USER" "$parent" 2>/dev/null || true
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            else
+                ln -sfn "$AGENT_DIR" "$target"
+            fi
+        done
+    fi
 fi
 
 # Usage examples

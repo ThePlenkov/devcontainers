@@ -9,6 +9,7 @@ INSTALL_METHOD=${INSTALLMETHOD:-"npm"}
 REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
 REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/null | cut -d: -f6)}"
 AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/opencode"
+SHARE_CONFIG="${SHARECONFIG:-false}"
 
 # Enable pipefail after home resolution (getent may fail under set -eo pipefail)
 set -o pipefail
@@ -91,26 +92,28 @@ if [[ ! -x /usr/local/bin/opencode ]]; then
 fi
 
 # Shared agent config
-mkdir -p "$AGENT_DIR"
-if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-    chown -R "$REMOTE_USER:" "$AGENT_DIR"
-fi
+if [[ "$SHARE_CONFIG" == "true" ]]; then
+    mkdir -p "$AGENT_DIR"
+    if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+        chown -R "$REMOTE_USER:" "$AGENT_DIR"
+    fi
 
-if [ -d "$REMOTE_USER_HOME" ]; then
-    for target in "$REMOTE_USER_HOME/.opencode" "$REMOTE_USER_HOME/.config/opencode"; do
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
-            mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
-        fi
-        parent=$(dirname "$target")
-        mkdir -p "$parent"
-        rm -f "$target"
-        if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-            chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
-        else
-            ln -sfn "$AGENT_DIR" "$target"
-        fi
-    done
+    if [ -d "$REMOTE_USER_HOME" ]; then
+        for target in "$REMOTE_USER_HOME/.opencode" "$REMOTE_USER_HOME/.config/opencode"; do
+            if [ -e "$target" ] && [ ! -L "$target" ]; then
+                mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
+            fi
+            parent=$(dirname "$target")
+            mkdir -p "$parent"
+            rm -f "$target"
+            if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+                chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            else
+                ln -sfn "$AGENT_DIR" "$target"
+            fi
+        done
+    fi
 fi
 
 # Verify installation (don't let version-check failures abort the build)

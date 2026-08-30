@@ -34,8 +34,7 @@ fi
 # CAO requires tmux 3.3+; warn if the installed version is too old
 TMUX_VERSION=$(tmux -V 2>/dev/null | awk '{print $2}' | grep -oE '^[0-9]+\.[0-9]+')
 if [[ -n "$TMUX_VERSION" ]] && [[ "$(echo "$TMUX_VERSION" | cut -d. -f1)" -lt 3 || ( "$(echo "$TMUX_VERSION" | cut -d. -f1)" -eq 3 && "$(echo "$TMUX_VERSION" | cut -d. -f2)" -lt 3 ) ]]; then
-    echo "Error: CAO requires tmux 3.3+, found $TMUX_VERSION." >&2
-    exit 1
+    echo "Warning: CAO requires tmux 3.3+, found $TMUX_VERSION. Some features may not work." >&2
 fi
 
 # Install uv if not present (required to install CAO)
@@ -61,7 +60,7 @@ fi
 
 # Install CAO via uv tool install
 # With UV_INSTALL_DIR=/usr/local, uv tools are installed to /usr/local/bin
-uv tool install "git+https://github.com/cao-ai/cao.git@${CAO_REF}" --force
+uv tool install "git+https://github.com/awslabs/cli-agent-orchestrator.git@${CAO_REF}" --force
 
 # Locate the installed binary and link it to /usr/local/bin
 CAO_BIN="$(command -v cao || true)"

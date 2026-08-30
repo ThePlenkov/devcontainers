@@ -128,10 +128,12 @@ if command -v docker-agent >/dev/null 2>&1; then
     if [[ $RC -eq 0 ]]; then
         echo "Docker Agent CLI version: ${OUT}"
     else
-        echo "Docker Agent CLI: version check skipped (exit ${RC})"
+        echo "Error: Docker Agent CLI version check failed (exit ${RC})" >&2
+        exit 1
     fi
 else
-    echo "Docker Agent CLI: binary not on PATH; skipping version check"
+    echo "Error: Docker Agent CLI binary not on PATH" >&2
+    exit 1
 fi
 set -e
 

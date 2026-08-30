@@ -77,7 +77,7 @@ chmod -R g+rwX /usr/local/share/agent-config 2>/dev/null || true
 cat > /etc/profile.d/paseo-perms.sh << 'PERMEOF'
 # Fix permissions on agent dirs at shell startup (catches dirs created after paseo install)
 for dir in "$HOME/.paseo" "$HOME/.agents" "$HOME/.config/environment.d"; do
-  if [[ -d "$dir" ]]; then
+  if [ -d "$dir" ]; then
     chgrp 0 "$dir" 2>/dev/null || true
     chmod g+rwX "$dir" 2>/dev/null || true
   fi

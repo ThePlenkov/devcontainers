@@ -25,6 +25,7 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts @qwen-code/qwen-code@"${VERSION}"
 fi
+npm rebuild -g @qwen-code/qwen-code 2>&1 || { echo "Error: qwen native binary setup failed" >&2; exit 1; }
 
 # Locate the installed binary from npm's global bin directory (not PATH)
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"

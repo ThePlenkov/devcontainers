@@ -61,7 +61,7 @@ else
     # Remove legacy ~/.cursor symlink if it points to this feature's AGENT_DIR
     if [[ -L "$REMOTE_USER_HOME/.cursor" ]]; then
         link_dest=$(readlink "$REMOTE_USER_HOME/.cursor" 2>/dev/null || true)
-        if [[ "$link_dest" == "$AGENT_DIR"* ]]; then
+        if [[ "$link_dest" == "$AGENT_DIR" ]]; then
             rm -f "$REMOTE_USER_HOME/.cursor"
         fi
     fi

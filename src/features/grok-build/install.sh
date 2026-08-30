@@ -82,7 +82,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         # Fix broken /usr/local/bin/grok after config migration
-        GROK_NEW_BIN=$(find "$AGENT_DIR" -name "grok" -type f -executable 2>/dev/null | head -1)
+        GROK_NEW_BIN=$(find "$AGENT_DIR" -name "grok" -executable 2>/dev/null | head -1)
         if [[ -n "$GROK_NEW_BIN" ]]; then
             ln -sf "$GROK_NEW_BIN" /usr/local/bin/grok
         fi

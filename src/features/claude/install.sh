@@ -33,7 +33,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             rm -f "$target"
             if id -u "$REMOTE_USER" >/dev/null 2>&1; then
                 chown "$REMOTE_USER:$REMOTE_USER" "$parent" 2>/dev/null || true
-                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
             else
                 ln -sfn "$AGENT_DIR" "$target"
             fi
@@ -47,7 +47,7 @@ if [[ "$SHARE_CONFIG" != "true" ]]; then
         for old_target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
             if [[ -L "$old_target" ]]; then
                 link_dest=$(readlink "$old_target" 2>/dev/null || true)
-                if [[ "$link_dest" == "$AGENT_DIR"* ]]; then
+                if [[ "$link_dest" == "$AGENT_DIR" ]]; then
                     rm -f "$old_target"
                 fi
             fi

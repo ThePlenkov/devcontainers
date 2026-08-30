@@ -25,7 +25,7 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts @github/copilot@"${VERSION}"
 fi
-npm rebuild -g @github/copilot 2>/dev/null || true
+npm rebuild -g @github/copilot 2>&1 || { echo "Error: copilot native binary setup failed" >&2; exit 1; }
 
 # Locate and link the binary to /usr/local/bin
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"

@@ -37,7 +37,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 # Determine the release tag
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    API_RESPONSE=$(curl --proto =https -fsSL "https://api.github.com/repos/aaif-goose/goose/releases/latest" 2>/dev/null)
+    API_RESPONSE=$(curl --proto =https --proto-redir =https -fsSL "https://api.github.com/repos/aaif-goose/goose/releases/latest" 2>/dev/null)
     if command -v jq &> /dev/null; then
         RELEASE_TAG=$(echo "$API_RESPONSE" | jq -r '.tag_name' 2>/dev/null)
     else
@@ -58,14 +58,14 @@ TARBALL="goose-${GOOSE_ARCH}-unknown-${OS}-gnu.tar.gz"
 DOWNLOAD_URL="https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/${TARBALL}"
 
 echo "Downloading: $DOWNLOAD_URL"
-if ! curl --proto =https -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/goose.tar.gz"; then
+if ! curl --proto =https --proto-redir =https -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/goose.tar.gz"; then
     echo "Error: Failed to download Goose from $DOWNLOAD_URL" >&2
     exit 1
 fi
 
 # Download checksums and verify SHA256 (CWE-494)
 # Goose releases may not publish checksums.txt — warn and continue if absent.
-if curl --proto =https -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt" 2>/dev/null \
+if curl --proto =https --proto-redir =https -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt" 2>/dev/null \
     && [[ -s "$TMP_DIR/checksums.txt" ]]; then
     expected=$(grep -E "^[a-f0-9]+[[:space:]]+${TARBALL}$" "$TMP_DIR/checksums.txt" | awk '{print $1}')
     if [[ -n "$expected" ]]; then

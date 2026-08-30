@@ -24,9 +24,9 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts cline@"${VERSION}"
 fi
-npm rebuild -g cline 2>/dev/null || true
+npm rebuild -g cline 2>&1 || { echo "Error: cline native binary setup failed" >&2; exit 1; }
 
-# Locate the installed binary and copy it to /usr/local/bin
+# Locate the installed binary and symlink it to /usr/local/bin
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
 CLINE_BIN="$NPM_GLOBAL_BIN/cline"
 

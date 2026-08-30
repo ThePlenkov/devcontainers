@@ -73,7 +73,7 @@ case "$INSTALL_METHOD" in
             cp "$OPENCODE_BIN" /usr/local/bin/opencode
             chmod +x /usr/local/bin/opencode
         fi
-        echo "OpenCode linked to /usr/local/bin/opencode"
+        echo "OpenCode copied to /usr/local/bin/opencode"
         ;;
 
     *)
@@ -110,6 +110,18 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             fi
         done
     fi
+fi
+
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.opencode" "$REMOTE_USER_HOME/.config/opencode"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
+        fi
+    done
 fi
 
 # Verify installation (don't let version-check failures abort the build)

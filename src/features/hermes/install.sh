@@ -56,6 +56,11 @@ fi
 chmod +x /usr/local/bin/hermes
 echo "Hermes CLI linked to /usr/local/bin/hermes"
 
+# Ensure the HERMES_HOME directory is owned by the remote user (not root)
+if id -u "$REMOTE_USER" >/dev/null 2>&1 && [[ "$REMOTE_USER" != "root" ]]; then
+    chown -R "$REMOTE_USER:" "${HERMES_HOME}" 2>/dev/null || true
+fi
+
 # Profile.d for login shells
 # Use REMOTE_USER_HOME (resolved at build time) instead of $HOME, which may be
 # set to "/" on OpenShift restricted SCC.

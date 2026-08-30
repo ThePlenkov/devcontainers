@@ -167,7 +167,7 @@ if [[ "$SHARE_CONFIG" != "true" ]]; then
     for old_target in "$REMOTE_USER_HOME/.devin" "$REMOTE_USER_HOME/.config/devin"; do
         if [[ -L "$old_target" ]]; then
             link_dest=$(readlink "$old_target" 2>/dev/null || true)
-            if [[ "$link_dest" == "$AGENT_DIR"* ]]; then
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
                 rm -f "$old_target"
             fi
         fi

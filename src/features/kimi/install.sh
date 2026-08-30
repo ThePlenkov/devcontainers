@@ -29,7 +29,7 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts @moonshot-ai/kimi-code@"${VERSION}"
 fi
-npm rebuild -g @moonshot-ai/kimi-code 2>/dev/null || true
+npm rebuild -g @moonshot-ai/kimi-code 2>&1 || { echo "Error: kimi native binary setup failed" >&2; exit 1; }
 
 # Locate the installed binary from npm's global bin directory (not PATH)
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"

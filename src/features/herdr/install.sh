@@ -99,6 +99,18 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
     fi
 fi
 
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.herdr" "$REMOTE_USER_HOME/.config/herdr"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
+        fi
+    done
+fi
+
 # Locate the installed binary and copy it to /usr/local/bin for system-wide access
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
 HERDR_BIN="$NPM_GLOBAL_BIN/herdr"

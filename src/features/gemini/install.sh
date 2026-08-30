@@ -21,9 +21,9 @@ fi
 
 # Install Gemini CLI globally
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g @google/gemini-cli
+    npm install -g --ignore-scripts @google/gemini-cli
 else
-    npm install -g @google/gemini-cli@"${VERSION}"
+    npm install -g --ignore-scripts @google/gemini-cli@"${VERSION}"
 fi
 
 # Locate and link the binary to /usr/local/bin
@@ -52,9 +52,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.gemini"
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
+        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         parent=$(dirname "$target")

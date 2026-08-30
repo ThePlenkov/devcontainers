@@ -41,7 +41,7 @@ else
 fi
 
 echo "Downloading: $DOWNLOAD_URL"
-if ! curl -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/docker-agent"; then
+if ! curl --proto =https -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/docker-agent"; then
     echo "Error: Failed to download Docker Agent from $DOWNLOAD_URL" >&2
     exit 1
 fi
@@ -71,9 +71,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.config/cagent"
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
+        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         parent=$(dirname "$target")

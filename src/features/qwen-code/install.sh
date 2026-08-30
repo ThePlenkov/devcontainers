@@ -25,9 +25,9 @@ fi
 
 # Install Qwen Code CLI globally via npm
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g @qwen-code/qwen-code
+    npm install -g --ignore-scripts @qwen-code/qwen-code
 else
-    npm install -g @qwen-code/qwen-code@"${VERSION}"
+    npm install -g --ignore-scripts @qwen-code/qwen-code@"${VERSION}"
 fi
 
 # Locate the installed binary and copy it to /usr/local/bin
@@ -57,9 +57,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.qwen"
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
+        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         parent=$(dirname "$target")

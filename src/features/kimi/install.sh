@@ -25,9 +25,9 @@ fi
 
 # Install Kimi Code CLI globally via npm
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g @moonshot-ai/kimi-code
+    npm install -g --ignore-scripts @moonshot-ai/kimi-code
 else
-    npm install -g @moonshot-ai/kimi-code@"${VERSION}"
+    npm install -g --ignore-scripts @moonshot-ai/kimi-code@"${VERSION}"
 fi
 
 # Locate the installed binary and copy it to /usr/local/bin
@@ -57,9 +57,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.kimi"
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
+        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         parent=$(dirname "$target")

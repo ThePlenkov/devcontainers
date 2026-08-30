@@ -26,7 +26,7 @@ fi
 # Install uv if not present (required to install CAO)
 if ! command -v uv &> /dev/null; then
     echo "uv not found; installing uv..."
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    curl --proto =https -LsSf https://astral.sh/uv/install.sh | sh
     export PATH="$HOME/.local/bin:$PATH"
     # Also make uv available system-wide
     if [[ -x "$HOME/.local/bin/uv" ]]; then
@@ -73,9 +73,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.aws/cli-agent-orchestrator"
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
+        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         parent=$(dirname "$target")

@@ -69,7 +69,7 @@ github_latest_tag() {
     tag="$(curl --proto =https -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
         | jq -r '.tag_name // empty' 2>/dev/null)"
     set -e
-    if [ -z "$tag" ]; then
+    if [[ -z "$tag" ]]; then
         # Fallback: parse the redirect target of the /latest tag URL.
         set +e
         tag="$(curl --proto =https -fsSLI -o /dev/null -w '%{url_effective}' \
@@ -91,9 +91,9 @@ strip_v() {
 install_gascity() {
     local version="$GASCITY_VERSION"
     local tag
-    if [ "$version" = "latest" ] || [ -z "$version" ]; then
+    if [[ "$version" = "latest" ]] || [[ -z "$version" ]]; then
         tag="$(github_latest_tag "gastownhall/gascity")"
-        if [ -z "$tag" ]; then
+        if [[ -z "$tag" ]]; then
             echo "Error: could not resolve latest Gas City release tag." >&2
             exit 1
         fi
@@ -110,7 +110,7 @@ install_gascity() {
     curl --proto =https -fsSL "$url" -o "$tmpdir/$asset"
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
-    if [ ! -f "$tmpdir/gc" ]; then
+    if [[ ! -f "$tmpdir/gc" ]]; then
         echo "Error: gc binary not found in Gas City tarball." >&2
         exit 1
     fi
@@ -123,7 +123,7 @@ install_gascity() {
 # ---------------------------------------------------------------------------
 install_dolt() {
     local tag; tag="$(github_latest_tag "dolthub/dolt")"
-    if [ -z "$tag" ]; then
+    if [[ -z "$tag" ]]; then
         echo "Error: could not resolve latest Dolt release tag." >&2
         exit 1
     fi
@@ -139,12 +139,12 @@ install_dolt() {
     # Dolt tarball layout: either ./bin/dolt or ./dolt
     local dolt_bin=""
     for candidate in "$tmpdir/bin/dolt" "$tmpdir/dolt" "$(find "$tmpdir" -type f -name dolt -perm -u+x | head -n1)"; do
-        if [ -f "$candidate" ]; then
+        if [[ -f "$candidate" ]]; then
             dolt_bin="$candidate"
             break
         fi
     done
-    if [ -z "$dolt_bin" ]; then
+    if [[ -z "$dolt_bin" ]]; then
         echo "Error: dolt binary not found in Dolt tarball." >&2
         exit 1
     fi
@@ -157,7 +157,7 @@ install_dolt() {
 # ---------------------------------------------------------------------------
 install_beads() {
     local tag; tag="$(github_latest_tag "gastownhall/beads")"
-    if [ -z "$tag" ]; then
+    if [[ -z "$tag" ]]; then
         echo "Error: could not resolve latest beads release tag." >&2
         exit 1
     fi
@@ -174,12 +174,12 @@ install_beads() {
     # beads tarball layout: either ./bd or ./bin/bd
     local bd_bin=""
     for candidate in "$tmpdir/bd" "$tmpdir/bin/bd" "$(find "$tmpdir" -type f -name bd -perm -u+x | head -n1)"; do
-        if [ -f "$candidate" ]; then
+        if [[ -f "$candidate" ]]; then
             bd_bin="$candidate"
             break
         fi
     done
-    if [ -z "$bd_bin" ]; then
+    if [[ -z "$bd_bin" ]]; then
         echo "Error: bd binary not found in beads tarball." >&2
         exit 1
     fi
@@ -211,8 +211,8 @@ if id -u "$REMOTE_USER" >/dev/null 2>&1; then
     chown -R "$REMOTE_USER:" "$AGENT_DIR"
 fi
 
-if [ -d "$REMOTE_USER_HOME" ]; then
-    if [ -e "$REMOTE_USER_HOME/.gascity" ] && [ ! -L "$REMOTE_USER_HOME/.gascity" ]; then
+if [[ -d "$REMOTE_USER_HOME" ]]; then
+    if [[ -e "$REMOTE_USER_HOME/.gascity" ]] && [[ ! -L "$REMOTE_USER_HOME/.gascity" ]]; then
         mv "$REMOTE_USER_HOME/.gascity" "$AGENT_DIR/legacy-gascity"
     fi
     rm -f "$REMOTE_USER_HOME/.gascity"
@@ -227,7 +227,7 @@ cp scripts/entrypoint.sh /usr/local/share/gascity/entrypoint.sh
 chmod +x /usr/local/share/gascity/entrypoint.sh
 
 AUTOREGISTER="${AUTOREGISTER:-false}"
-if [ "$AUTOREGISTER" = "true" ]; then
+if [[ "$AUTOREGISTER" = "true" ]]; then
     echo "true" > /usr/local/share/gascity/autoregister_enabled
 else
     echo "false" > /usr/local/share/gascity/autoregister_enabled

@@ -21,9 +21,9 @@ fi
 
 # Install Copilot CLI globally
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g @github/copilot
+    npm install -g --ignore-scripts @github/copilot
 else
-    npm install -g @github/copilot@"${VERSION}"
+    npm install -g --ignore-scripts @github/copilot@"${VERSION}"
 fi
 
 # Locate and link the binary to /usr/local/bin
@@ -52,9 +52,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.copilot"
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
+        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         parent=$(dirname "$target")

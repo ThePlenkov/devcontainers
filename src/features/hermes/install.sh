@@ -24,7 +24,7 @@ fi
 
 # Run the upstream Hermes installer (non-interactive, skip initial setup)
 # Download-then-execute instead of curl|bash (review finding)
-curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$TMP_DIR/hermes-install.sh"
+curl --proto =https -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$TMP_DIR/hermes-install.sh"
 bash "$TMP_DIR/hermes-install.sh" -s -- --non-interactive --skip-setup
 
 # Locate the installed binary and link it to /usr/local/bin
@@ -62,9 +62,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.hermes"
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
+        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         parent=$(dirname "$target")

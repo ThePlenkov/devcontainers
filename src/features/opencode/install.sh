@@ -28,9 +28,9 @@ case "$INSTALL_METHOD" in
             exit 1
         fi
         if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-            npm install -g opencode-ai
+            npm install -g --ignore-scripts opencode-ai
         else
-            npm install -g opencode-ai@"${VERSION}"
+            npm install -g --ignore-scripts opencode-ai@"${VERSION}"
         fi
         # Copy binary to /usr/local/bin for system-wide access
         OPENCODE_BIN="$(command -v opencode || true)"
@@ -98,9 +98,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         for target in "$REMOTE_USER_HOME/.opencode" "$REMOTE_USER_HOME/.config/opencode"; do
-            if [ -e "$target" ] && [ ! -L "$target" ]; then
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
                 mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
             fi
             parent=$(dirname "$target")

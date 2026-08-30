@@ -48,18 +48,18 @@ TARBALL="goose-${GOOSE_ARCH}-unknown-${OS}-gnu.tar.gz"
 DOWNLOAD_URL="https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/${TARBALL}"
 
 echo "Downloading: $DOWNLOAD_URL"
-if ! curl -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/goose.tar.gz"; then
+if ! curl --proto =https -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/goose.tar.gz"; then
     echo "Error: Failed to download Goose from $DOWNLOAD_URL" >&2
     exit 1
 fi
 
 # Download checksums and verify SHA256 (CWE-494)
-curl -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt" || true
-if [ -f "$TMP_DIR/checksums.txt" ]; then
+curl --proto =https -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt" || true
+if [[ -f "$TMP_DIR/checksums.txt" ]]; then
     expected=$(grep "$TARBALL" "$TMP_DIR/checksums.txt" | awk '{print $1}')
-    if [ -n "$expected" ]; then
+    if [[ -n "$expected" ]]; then
         actual=$(sha256sum "$TMP_DIR/goose.tar.gz" | awk '{print $1}')
-        if [ "$expected" != "$actual" ]; then
+        if [[ "$expected" != "$actual" ]]; then
             echo "Error: SHA256 mismatch for $TARBALL" >&2
             exit 1
         fi
@@ -89,9 +89,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.config/goose"
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
+        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         parent=$(dirname "$target")

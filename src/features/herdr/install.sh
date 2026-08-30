@@ -24,9 +24,9 @@ HERDR_INSTALLED=0
 if command -v npm &> /dev/null; then
     set +e
     if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-        npm install -g herdr
+        npm install -g --ignore-scripts herdr
     else
-        npm install -g herdr@"${VERSION}"
+        npm install -g --ignore-scripts herdr@"${VERSION}"
     fi
     NPM_RC=$?
     set -e
@@ -101,9 +101,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         for target in "$REMOTE_USER_HOME/.herdr" "$REMOTE_USER_HOME/.config/herdr"; do
-            if [ -e "$target" ] && [ ! -L "$target" ]; then
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
                 mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
             fi
             parent=$(dirname "$target")

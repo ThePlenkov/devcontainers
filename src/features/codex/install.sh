@@ -24,9 +24,9 @@ fi
 
 # Install Codex CLI globally via npm
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g @openai/codex
+    npm install -g --ignore-scripts @openai/codex
 else
-    npm install -g @openai/codex@"${VERSION}"
+    npm install -g --ignore-scripts @openai/codex@"${VERSION}"
 fi
 
 # Locate the installed binary and copy it to /usr/local/bin for system-wide access
@@ -56,9 +56,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         for target in "$REMOTE_USER_HOME/.codex" "$REMOTE_USER_HOME/.config/codex"; do
-            if [ -e "$target" ] && [ ! -L "$target" ]; then
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
                 mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
             fi
             parent=$(dirname "$target")

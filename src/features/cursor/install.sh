@@ -28,7 +28,7 @@ su -s /bin/bash - "$REMOTE_USER" -c \
 
 # Expose Cursor agent binaries system-wide
 for bin in agent cursor-agent; do
-    if [ -x "$REMOTE_USER_HOME/.local/bin/$bin" ]; then
+    if [[ -x "$REMOTE_USER_HOME/.local/bin/$bin" ]]; then
         ln -sfn "$REMOTE_USER_HOME/.local/bin/$bin" "/usr/local/bin/$bin"
     fi
 done
@@ -40,8 +40,8 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
-        if [ -e "$REMOTE_USER_HOME/.cursor" ] && [ ! -L "$REMOTE_USER_HOME/.cursor" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
+        if [[ -e "$REMOTE_USER_HOME/.cursor" ]] && [[ ! -L "$REMOTE_USER_HOME/.cursor" ]]; then
             mv "$REMOTE_USER_HOME/.cursor" "$AGENT_DIR/legacy-cursor"
         fi
         rm -f "$REMOTE_USER_HOME/.cursor"

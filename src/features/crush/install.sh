@@ -21,9 +21,9 @@ fi
 
 # Install Crush globally
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g @charmland/crush
+    npm install -g --ignore-scripts @charmland/crush
 else
-    npm install -g @charmland/crush@"${VERSION}"
+    npm install -g --ignore-scripts @charmland/crush@"${VERSION}"
 fi
 
 # Locate and link the binary to /usr/local/bin
@@ -52,9 +52,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         target="$REMOTE_USER_HOME/.config/crush"
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
+        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
             mv "$target" "$AGENT_DIR/config-legacy"
         fi
         parent=$(dirname "$target")

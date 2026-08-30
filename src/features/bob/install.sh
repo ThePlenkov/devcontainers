@@ -13,9 +13,9 @@ SHARE_CONFIG="${SHARECONFIG:-false}"
 echo "Installing Bob Shell ${VERSION}..."
 
 if [[ "$VERSION" = "latest" ]]; then
-    npm install -g @roo-code/bob-shell
+    npm install -g --ignore-scripts @roo-code/bob-shell
 else
-    npm install -g @roo-code/bob-shell@"$VERSION"
+    npm install -g --ignore-scripts @roo-code/bob-shell@"$VERSION"
 fi
 
 if command -v bob &> /dev/null; then
@@ -32,9 +32,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         for target in "$REMOTE_USER_HOME/.bob" "$REMOTE_USER_HOME/.config/bob"; do
-            if [ -e "$target" ] && [ ! -L "$target" ]; then
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
                 mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
             fi
             parent=$(dirname "$target")

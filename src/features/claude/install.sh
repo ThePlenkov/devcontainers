@@ -23,9 +23,9 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
     fi
 
-    if [ -d "$REMOTE_USER_HOME" ]; then
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
         for target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
-            if [ -e "$target" ] && [ ! -L "$target" ]; then
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
                 mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
             fi
             parent=$(dirname "$target")

@@ -18,22 +18,15 @@
       "default": "latest",
       "description": "Version of Claude Code to install (npm package version or 'latest')"
     },
-    "apiKey": {
-      "type": "string",
-      "default": "",
-      "description": "Anthropic API key (or set ANTHROPIC_API_KEY env var)"
-    },
     "shareConfig": {
       "type": "boolean",
       "default": false,
       "description": "When true, symlink ~/.claude to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
     }
   },
-  "containerEnv": {
-    "ANTHROPIC_API_KEY": "${containerEnv:ANTHROPIC_API_KEY}"
-  },
   "dependsOn": {
-    "ghcr.io/docker-x/devcontainers/agent-config": {}
+    "ghcr.io/docker-x/devcontainers/agent-config": {},
+    "ghcr.io/devcontainers/features/node": {}
   },
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils",

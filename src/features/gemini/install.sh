@@ -5,7 +5,6 @@ set -e
 # Installs the @google/gemini-cli npm package globally.
 
 VERSION="${VERSION:-"latest"}"
-API_KEY="${APIKEY:-""}"
 SHARE_CONFIG="${SHARECONFIG:-false}"
 REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
 REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/null | cut -d: -f6)}"
@@ -45,21 +44,6 @@ else
     exit 1
 fi
 
-# Set API key in /etc/environment if provided
-if [ -n "$API_KEY" ]; then
-    grep -q "^GEMINI_API_KEY=" /etc/environment 2>/dev/null || \
-        echo "GEMINI_API_KEY=\"$API_KEY\"" >> /etc/environment
-    echo "GEMINI_API_KEY set in /etc/environment"
-else
-    echo "No API key provided. Set GEMINI_API_KEY manually."
-fi
-
-# Profile.d for login shells
-cat > /etc/profile.d/gemini-cli.sh << 'EOF'
-export GEMINI_CONFIG_DIR="${GEMINI_CONFIG_DIR:-$HOME/.gemini}"
-EOF
-chmod 0755 /etc/profile.d/gemini-cli.sh
-
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then
     echo "shareConfig: linking ~/.gemini to $AGENT_DIR"
@@ -78,7 +62,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         rm -f "$target"
         if id -u "$REMOTE_USER" >/dev/null 2>&1; then
             chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
         else
             ln -sfn "$AGENT_DIR" "$target"
         fi

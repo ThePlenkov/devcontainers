@@ -216,7 +216,7 @@ if [ -d "$REMOTE_USER_HOME" ]; then
         mv "$REMOTE_USER_HOME/.gascity" "$AGENT_DIR/legacy-gascity"
     fi
     rm -f "$REMOTE_USER_HOME/.gascity"
-    su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$REMOTE_USER_HOME/.gascity'" 2>/dev/null || true
+    su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$REMOTE_USER_HOME/.gascity'"
 fi
 
 # ---------------------------------------------------------------------------

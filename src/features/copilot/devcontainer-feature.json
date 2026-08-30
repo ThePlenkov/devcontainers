@@ -26,7 +26,8 @@
   },
   "dependsOn": {
     "ghcr.io/docker-x/devcontainers/agent-config": {},
-    "ghcr.io/devcontainers/features/github-cli": {}
+    "ghcr.io/devcontainers/features/github-cli": {},
+    "ghcr.io/devcontainers/features/node": {}
   },
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils",

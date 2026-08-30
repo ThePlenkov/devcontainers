@@ -53,6 +53,20 @@ if ! curl -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/goose.tar.gz"; then
     exit 1
 fi
 
+# Download checksums and verify SHA256 (CWE-494)
+curl -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt" || true
+if [ -f "$TMP_DIR/checksums.txt" ]; then
+    expected=$(grep "$TARBALL" "$TMP_DIR/checksums.txt" | awk '{print $1}')
+    if [ -n "$expected" ]; then
+        actual=$(sha256sum "$TMP_DIR/goose.tar.gz" | awk '{print $1}')
+        if [ "$expected" != "$actual" ]; then
+            echo "Error: SHA256 mismatch for $TARBALL" >&2
+            exit 1
+        fi
+        echo "Checksum verified: $TARBALL"
+    fi
+fi
+
 # Extract
 tar -xzf "$TMP_DIR/goose.tar.gz" -C "$TMP_DIR"
 
@@ -63,15 +77,9 @@ if [[ -z "$GOOSE_BIN" ]]; then
     exit 1
 fi
 
-cp "$GOOSE_BIN" /usr/local/bin/goose
+ln -sf "$GOOSE_BIN" /usr/local/bin/goose
 chmod +x /usr/local/bin/goose
 echo "Goose CLI installed to /usr/local/bin/goose"
-
-# Profile.d for login shells
-cat > /etc/profile.d/goose.sh << 'EOF'
-export GOOSE_HOME="${GOOSE_HOME:-$HOME/.config/goose}"
-EOF
-chmod 0755 /etc/profile.d/goose.sh
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then
@@ -91,7 +99,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         rm -f "$target"
         if id -u "$REMOTE_USER" >/dev/null 2>&1; then
             chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
         else
             ln -sfn "$AGENT_DIR" "$target"
         fi

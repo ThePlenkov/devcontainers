@@ -44,13 +44,6 @@ else
     exit 1
 fi
 
-# Profile.d for login shells
-cat > /etc/profile.d/crush.sh << 'EOF'
-export CRUSH_GLOBAL_CONFIG="${CRUSH_GLOBAL_CONFIG:-$HOME/.config/crush/crush.json}"
-export CRUSH_GLOBAL_DATA="${CRUSH_GLOBAL_DATA:-$HOME/.crush}"
-EOF
-chmod 0755 /etc/profile.d/crush.sh
-
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then
     echo "shareConfig: linking ~/.config/crush to $AGENT_DIR"
@@ -69,7 +62,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         rm -f "$target"
         if id -u "$REMOTE_USER" >/dev/null 2>&1; then
             chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
         else
             ln -sfn "$AGENT_DIR" "$target"
         fi

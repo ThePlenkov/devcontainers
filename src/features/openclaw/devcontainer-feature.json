@@ -4,7 +4,14 @@
   "name": "OpenClaw",
   "description": "Install OpenClaw — a personal AI assistant CLI with TUI, messaging channels, multi-agent runtimes, and MCP tool bridge.",
   "documentationURL": "https://github.com/openclaw/openclaw",
-  "keywords": ["ai","openclaw","agent","cli","coding","assistant"],
+  "keywords": [
+    "ai",
+    "openclaw",
+    "agent",
+    "cli",
+    "coding",
+    "assistant"
+  ],
   "options": {
     "version": {
       "type": "string",
@@ -18,9 +25,12 @@
     }
   },
   "dependsOn": {
-    "ghcr.io/docker-x/devcontainers/agent-config": {}
+    "ghcr.io/docker-x/devcontainers/agent-config": {},
+    "ghcr.io/devcontainers/features/node": {}
   },
   "installsAfter": [
-    "ghcr.io/devcontainers/features/common-utils","ghcr.io/devcontainers/features/node","ghcr.io/docker-x/devcontainers/agent-config"
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/docker-x/devcontainers/agent-config"
   ]
 }

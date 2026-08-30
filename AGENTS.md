@@ -66,7 +66,9 @@ omit the `_REMOTE_USER` chain below — that's expected.
   When `shareConfig` is `false` (default), the agent uses its native config
   location with no sharing. When `true`, config is symlinked to the shared
   `AGENT_CONFIG_DIR` so it persists across container rebuilds and can be
-  shared with other agents. Every agent feature MUST have this option.
+  shared with other agents. Every agent feature that manages a config
+  directory SHOULD have this option. Features that don't manage config
+  (e.g. runtimes, build tools) may omit it.
 - Run user-scoped install steps as the remote user (`su -s /bin/bash -` or
   `sudo -u`), not as root, so file ownership is correct.
 - Keep `apt-get` calls consolidated: one `apt-get update`, one

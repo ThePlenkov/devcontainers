@@ -4,7 +4,14 @@
   "name": "Mastra Code",
   "description": "Install Mastra Code — a terminal-based AI coding agent from the Mastra team with Build/Plan/Fast modes.",
   "documentationURL": "https://github.com/mastra-ai/mastra",
-  "keywords": ["ai","mastra","agent","cli","coding","terminal"],
+  "keywords": [
+    "ai",
+    "mastra",
+    "agent",
+    "cli",
+    "coding",
+    "terminal"
+  ],
   "options": {
     "version": {
       "type": "string",
@@ -18,9 +25,12 @@
     }
   },
   "dependsOn": {
-    "ghcr.io/docker-x/devcontainers/agent-config": {}
+    "ghcr.io/docker-x/devcontainers/agent-config": {},
+    "ghcr.io/devcontainers/features/node": {}
   },
   "installsAfter": [
-    "ghcr.io/devcontainers/features/common-utils","ghcr.io/devcontainers/features/node","ghcr.io/docker-x/devcontainers/agent-config"
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/docker-x/devcontainers/agent-config"
   ]
 }

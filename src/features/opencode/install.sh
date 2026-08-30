@@ -108,7 +108,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             rm -f "$target"
             if id -u "$REMOTE_USER" >/dev/null 2>&1; then
                 chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
             else
                 ln -sfn "$AGENT_DIR" "$target"
             fi

@@ -45,14 +45,14 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             mv "$REMOTE_USER_HOME/.cursor" "$AGENT_DIR/legacy-cursor"
         fi
         rm -f "$REMOTE_USER_HOME/.cursor"
-        su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$REMOTE_USER_HOME/.cursor'" 2>/dev/null || true
+        su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$REMOTE_USER_HOME/.cursor'"
     fi
-fi
 
-# Make CURSOR_CONFIG_DIR available in login shells
-cat > /etc/profile.d/cursor.sh << EOF
+    # Only export CURSOR_CONFIG_DIR when shareConfig is enabled
+    cat > /etc/profile.d/cursor.sh << EOF
 export CURSOR_CONFIG_DIR="$AGENT_DIR"
 EOF
-chmod +x /etc/profile.d/cursor.sh
+    chmod +x /etc/profile.d/cursor.sh
+fi
 
 echo "Cursor Agent CLI installed successfully!"

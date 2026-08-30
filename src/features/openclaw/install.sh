@@ -51,7 +51,7 @@ echo "OpenClaw CLI copied to /usr/local/bin/openclaw"
 
 # Profile.d for login shells
 cat > /etc/profile.d/openclaw.sh << 'EOF'
-export OPENCLAW_STATE_DIR="${OPENCLAW_STATE_DIR:-$HOME/.openclaw}"
+export OPENCLAW_STATE_DIR="${OPENCLAW_STATE_DIR:-/home/vscode/.openclaw}"
 EOF
 chmod 0755 /etc/profile.d/openclaw.sh
 
@@ -73,7 +73,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         rm -f "$target"
         if id -u "$REMOTE_USER" >/dev/null 2>&1; then
             chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
         else
             ln -sfn "$AGENT_DIR" "$target"
         fi

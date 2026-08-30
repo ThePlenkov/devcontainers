@@ -1,6 +1,6 @@
 {
   "id": "codex",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "name": "OpenAI Codex CLI",
   "description": "Install OpenAI Codex CLI - AI coding agent for terminal-based development.",
   "documentationURL": "https://github.com/openai/codex",

@@ -1,6 +1,6 @@
 {
   "id": "claude",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "name": "Anthropic Claude",
   "description": "Configure Anthropic Claude SDK and share the agent config folder with other agents.",
   "documentationURL": "https://docs.anthropic.com",

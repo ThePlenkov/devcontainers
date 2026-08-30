@@ -44,12 +44,6 @@ else
     exit 1
 fi
 
-# Profile.d for login shells — expose COPILOT_HOME
-cat > /etc/profile.d/copilot-cli.sh << 'EOF'
-export COPILOT_HOME="${COPILOT_HOME:-$HOME/.copilot}"
-EOF
-chmod 0755 /etc/profile.d/copilot-cli.sh
-
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then
     echo "shareConfig: linking ~/.copilot to $AGENT_DIR"
@@ -68,7 +62,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         rm -f "$target"
         if id -u "$REMOTE_USER" >/dev/null 2>&1; then
             chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
         else
             ln -sfn "$AGENT_DIR" "$target"
         fi

@@ -4,7 +4,14 @@
   "name": "Cline CLI",
   "description": "Install Cline CLI — an open-source AI coding agent with VS Code extension and terminal CLI support.",
   "documentationURL": "https://github.com/cline/cline",
-  "keywords": ["ai","cline","agent","cli","coding","open-source"],
+  "keywords": [
+    "ai",
+    "cline",
+    "agent",
+    "cli",
+    "coding",
+    "open-source"
+  ],
   "options": {
     "version": {
       "type": "string",
@@ -18,9 +25,12 @@
     }
   },
   "dependsOn": {
-    "ghcr.io/docker-x/devcontainers/agent-config": {}
+    "ghcr.io/docker-x/devcontainers/agent-config": {},
+    "ghcr.io/devcontainers/features/node": {}
   },
   "installsAfter": [
-    "ghcr.io/devcontainers/features/common-utils","ghcr.io/devcontainers/features/node","ghcr.io/docker-x/devcontainers/agent-config"
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/docker-x/devcontainers/agent-config"
   ]
 }

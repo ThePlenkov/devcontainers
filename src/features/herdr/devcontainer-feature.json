@@ -1,6 +1,6 @@
 {
   "id": "herdr",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "name": "Herdr",
   "description": "Install Herdr - AI agent herd orchestration for coordinating multiple coding agents.",
   "keywords": [

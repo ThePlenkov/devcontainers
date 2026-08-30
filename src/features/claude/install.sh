@@ -3,7 +3,6 @@ set -e
 
 # Anthropic Claude Configuration Script
 
-API_KEY=${APIKEY:-""}
 REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
 REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/null | cut -d: -f6)}"
 REMOTE_USER_HOME="${REMOTE_USER_HOME:-$(eval echo ~$REMOTE_USER)}"
@@ -15,14 +14,6 @@ echo "Configuring Anthropic Claude..."
 # Install anthropic Python package if Python is available
 if command -v python3 &> /dev/null; then
     pip3 install anthropic || echo "Failed to install anthropic package"
-fi
-
-# Set up environment variable if API key is provided
-if [ -n "$API_KEY" ]; then
-    echo "export ANTHROPIC_API_KEY=$API_KEY" >> /etc/environment
-    echo "ANTHROPIC_API_KEY set in /etc/environment"
-else
-    echo "No API key provided. Set ANTHROPIC_API_KEY manually."
 fi
 
 # Shared agent config for Claude
@@ -42,7 +33,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             rm -f "$target"
             if id -u "$REMOTE_USER" >/dev/null 2>&1; then
                 chown "$REMOTE_USER:$REMOTE_USER" "$parent" 2>/dev/null || true
-                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
             else
                 ln -sfn "$AGENT_DIR" "$target"
             fi

@@ -11,6 +11,10 @@ REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/nul
 REMOTE_USER_HOME="${REMOTE_USER_HOME:-/home/vscode}"
 AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/grok-build"
 
+# Temp dir for downloaded installers (CWE-377)
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT
+
 echo "Installing Grok Build CLI (version: ${VERSION})..."
 
 # Install curl if not present
@@ -19,7 +23,9 @@ if ! command -v curl &> /dev/null; then
 fi
 
 # Run the upstream Grok installer
-curl -fsSL https://x.ai/cli/install.sh | bash
+# Download-then-execute instead of curl|bash (review finding)
+curl -fsSL https://x.ai/cli/install.sh -o "$TMP_DIR/grok-install.sh"
+bash "$TMP_DIR/grok-install.sh"
 
 # Locate the installed binary and link it to /usr/local/bin
 GROK_BIN="$(command -v grok || true)"
@@ -44,7 +50,7 @@ echo "Grok Build CLI linked to /usr/local/bin/grok"
 
 # Profile.d for login shells
 cat > /etc/profile.d/grok-build.sh << 'EOF'
-export GROK_HOME="${GROK_HOME:-$HOME/.grok}"
+export GROK_HOME="${GROK_HOME:-/home/vscode/.grok}"
 EOF
 chmod 0755 /etc/profile.d/grok-build.sh
 
@@ -66,7 +72,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         rm -f "$target"
         if id -u "$REMOTE_USER" >/dev/null 2>&1; then
             chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
         else
             ln -sfn "$AGENT_DIR" "$target"
         fi

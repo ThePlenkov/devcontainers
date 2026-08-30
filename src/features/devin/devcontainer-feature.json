@@ -1,6 +1,6 @@
 {
   "id": "devin",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "name": "Devin CLI",
   "description": "Install Devin CLI for AI-powered development and share its config folder with other agents.",
   "documentationURL": "https://devin.ai",

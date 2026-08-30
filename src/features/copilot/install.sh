@@ -29,7 +29,7 @@ fi
 # Locate and link the binary to /usr/local/bin
 COPILOT_BIN="$(command -v copilot || true)"
 if [[ -z "$COPILOT_BIN" ]]; then
-    NPM_GLOBAL_BIN="1000 4 24 27 30 46 100 1000 1001npm config get prefix 2>/dev/null || true)/bin"
+    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
     COPILOT_BIN="$NPM_GLOBAL_BIN/copilot"
 fi
 

@@ -32,19 +32,18 @@ fi
 # Explicitly run postinstall to install native binaries
 npm rebuild -g @ampcode/cli 2>/dev/null || true
 
-# Locate the installed binary and copy it to /usr/local/bin
-AMP_BIN="$(command -v amp || true)"
-if [[ -z "$AMP_BIN" ]]; then
-    NPM_GLOBAL_BIN="1000 4 24 27 30 46 100 1000 1001npm config get prefix 2>/dev/null || true)/bin"
-    AMP_BIN="$NPM_GLOBAL_BIN/amp"
-fi
+# Locate the installed binary from npm's global bin directory (not PATH)
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+AMP_BIN="$NPM_GLOBAL_BIN/amp"
 
 if [[ ! -x "$AMP_BIN" ]]; then
     echo "Amp CLI installation failed: binary not found at $AMP_BIN" >&2
     exit 1
 fi
 
-ln -sf "$AMP_BIN" /usr/local/bin/amp
+if [[ -n "$AMP_BIN" && "$AMP_BIN" != "/usr/local/bin/amp" ]]; then
+    ln -sf "$AMP_BIN" /usr/local/bin/amp
+fi
 echo "Amp CLI linked to /usr/local/bin/amp"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled

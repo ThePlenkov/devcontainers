@@ -33,7 +33,7 @@ fi
 # Locate the installed binary and copy it to /usr/local/bin
 CLINE_BIN="$(command -v cline || true)"
 if [[ -z "$CLINE_BIN" ]]; then
-    NPM_GLOBAL_BIN="1000 4 24 27 30 46 100 1000 1001npm config get prefix 2>/dev/null || true)/bin"
+    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
     CLINE_BIN="$NPM_GLOBAL_BIN/cline"
 fi
 

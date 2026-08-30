@@ -27,7 +27,7 @@ else
 fi
 
 # Locate the installed binary from npm's global bin directory (not PATH)
-NPM_GLOBAL_BIN="1000 4 24 27 30 46 100 1000 1001npm config get prefix 2>/dev/null || true)/bin"
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
 QWEN_BIN="$NPM_GLOBAL_BIN/qwen"
 
 if [[ ! -x "$QWEN_BIN" ]]; then

@@ -31,7 +31,7 @@ npm rebuild -g @anthropic-ai/claude-code 2>/dev/null || true
 # Locate and link the binary to /usr/local/bin
 CLAUDE_BIN="$(command -v claude || true)"
 if [[ -z "$CLAUDE_BIN" ]]; then
-    NPM_GLOBAL_BIN="1000 4 24 27 30 46 100 1000 1001npm config get prefix 2>/dev/null || true)/bin"
+    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
     CLAUDE_BIN="$NPM_GLOBAL_BIN/claude"
 fi
 

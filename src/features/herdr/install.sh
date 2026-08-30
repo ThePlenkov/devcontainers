@@ -30,6 +30,10 @@ if command -v npm &> /dev/null; then
     fi
     NPM_RC=$?
     set -e
+    # Explicitly run postinstall for native dependencies
+    if [[ $NPM_RC -eq 0 ]]; then
+        npm rebuild -g herdr 2>/dev/null || true
+    fi
     if [[ $NPM_RC -eq 0 ]]; then
         HERDR_INSTALLED=1
         echo "Herdr installed via npm"

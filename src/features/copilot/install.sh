@@ -25,16 +25,16 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts @github/copilot@"${VERSION}"
 fi
+npm rebuild -g @github/copilot 2>/dev/null || true
 
 # Locate and link the binary to /usr/local/bin
-COPILOT_BIN="$(command -v copilot || true)"
-if [[ -z "$COPILOT_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    COPILOT_BIN="$NPM_GLOBAL_BIN/copilot"
-fi
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+COPILOT_BIN="$NPM_GLOBAL_BIN/copilot"
 
 if [[ -x "$COPILOT_BIN" ]]; then
-    ln -sf "$COPILOT_BIN" /usr/local/bin/copilot
+    if [[ -n "$COPILOT_BIN" && "$COPILOT_BIN" != "/usr/local/bin/copilot" ]]; then
+        ln -sf "$COPILOT_BIN" /usr/local/bin/copilot
+    fi
     echo "Copilot CLI linked to /usr/local/bin/copilot"
 else
     echo "Error: Copilot CLI binary not found at $COPILOT_BIN" >&2

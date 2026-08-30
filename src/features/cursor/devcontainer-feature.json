@@ -10,9 +10,6 @@
     "development",
     "cli"
   ],
-  "containerEnv": {
-    "CURSOR_CONFIG_DIR": "/usr/local/share/agent-config/cursor"
-  },
   "dependsOn": {
     "ghcr.io/docker-x/devcontainers/agent-config": {}
   },

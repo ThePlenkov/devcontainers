@@ -13,6 +13,11 @@ AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/goose"
 
 echo "Installing Goose CLI (version: ${VERSION})..."
 
+# Install curl if not present
+if ! command -v curl &> /dev/null; then
+    apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+fi
+
 # Detect architecture
 ARCH=$(uname -m)
 case "$ARCH" in
@@ -59,20 +64,24 @@ if ! curl --proto =https -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/goose.tar.gz"; then
 fi
 
 # Download checksums and verify SHA256 (CWE-494)
-if ! curl --proto =https -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt"; then
-    echo "Error: Could not download checksums file for $RELEASE_TAG" >&2
-    exit 1
-fi
-if [[ -f "$TMP_DIR/checksums.txt" ]]; then
+# Goose releases may not publish checksums.txt — warn and continue if absent.
+if curl --proto =https -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt" 2>/dev/null \
+    && [[ -s "$TMP_DIR/checksums.txt" ]]; then
     expected=$(grep "$TARBALL" "$TMP_DIR/checksums.txt" | awk '{print $1}')
     if [[ -n "$expected" ]]; then
         actual=$(sha256sum "$TMP_DIR/goose.tar.gz" | awk '{print $1}')
         if [[ "$expected" != "$actual" ]]; then
             echo "Error: SHA256 mismatch for $TARBALL" >&2
+            echo "  expected: $expected" >&2
+            echo "  actual:   $actual" >&2
             exit 1
         fi
         echo "Checksum verified: $TARBALL"
+    else
+        echo "WARNING: $TARBALL not found in checksums.txt; skipping checksum verification" >&2
     fi
+else
+    echo "WARNING: checksums.txt not available for $RELEASE_TAG; skipping checksum verification" >&2
 fi
 
 # Extract

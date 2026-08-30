@@ -29,6 +29,7 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts @moonshot-ai/kimi-code@"${VERSION}"
 fi
+npm rebuild -g @moonshot-ai/kimi-code 2>/dev/null || true
 
 # Locate the installed binary and copy it to /usr/local/bin
 KIMI_BIN="$(command -v kimi || true)"

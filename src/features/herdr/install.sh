@@ -73,27 +73,6 @@ if [[ $HERDR_INSTALLED -eq 0 ]]; then
     echo "Herdr installed via install script"
 fi
 
-# Locate the installed binary and copy it to /usr/local/bin for system-wide access
-HERDR_BIN="$(command -v herdr || true)"
-if [[ -z "$HERDR_BIN" ]] && command -v npm >/dev/null 2>&1; then
-    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    HERDR_BIN="$NPM_GLOBAL_BIN/herdr"
-fi
-if [[ -z "$HERDR_BIN" ]] || [[ ! -x "$HERDR_BIN" ]]; then
-    HERDR_BIN="${REMOTE_USER_HOME:-$HOME}/.local/bin/herdr"
-fi
-
-if [[ ! -x "$HERDR_BIN" ]]; then
-    echo "Warning: Herdr binary not found at $HERDR_BIN — herdr may not be published yet" >&2
-    echo "Herdr feature installed (configuration only). Binary will be available when herdr is published."
-    echo "Herdr feature installed successfully (configuration only, binary pending publication)"
-    exit 0
-fi
-
-ln -sf "$HERDR_BIN" /usr/local/bin/herdr
-chmod +x /usr/local/bin/herdr
-echo "Herdr linked to /usr/local/bin/herdr"
-
 # Shared agent config
 if [[ "$SHARE_CONFIG" == "true" ]]; then
     mkdir -p "$AGENT_DIR"
@@ -118,6 +97,26 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         done
     fi
 fi
+
+# Locate the installed binary and copy it to /usr/local/bin for system-wide access
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+HERDR_BIN="$NPM_GLOBAL_BIN/herdr"
+if [[ ! -x "$HERDR_BIN" ]]; then
+    HERDR_BIN="${REMOTE_USER_HOME:-$HOME}/.local/bin/herdr"
+fi
+
+if [[ ! -x "$HERDR_BIN" ]]; then
+    echo "Warning: Herdr binary not found at $HERDR_BIN — herdr may not be published yet" >&2
+    echo "Herdr feature installed (configuration only). Binary will be available when herdr is published."
+    echo "Herdr feature installed successfully (configuration only, binary pending publication)"
+    exit 0
+fi
+
+if [[ -n "$HERDR_BIN" && "$HERDR_BIN" != "/usr/local/bin/herdr" ]]; then
+    ln -sf "$HERDR_BIN" /usr/local/bin/herdr
+fi
+chmod +x /usr/local/bin/herdr
+echo "Herdr linked to /usr/local/bin/herdr"
 
 # Verify installation (don't let version-check failures abort the build)
 set +e

@@ -33,7 +33,7 @@ case "$INSTALL_METHOD" in
             npm install -g --ignore-scripts opencode-ai@"${VERSION}"
         fi
         # Explicitly run postinstall to install native binaries
-        npm rebuild -g opencode-ai 2>/dev/null || true
+        npm rebuild -g opencode-ai 2>&1 || { echo "Error: opencode native binary setup failed" >&2; exit 1; }
         # Copy binary to /usr/local/bin for system-wide access
         OPENCODE_BIN="$(command -v opencode || true)"
         if [[ -z "$OPENCODE_BIN" ]]; then
@@ -48,7 +48,9 @@ case "$INSTALL_METHOD" in
             echo "OpenCode installation failed: binary not found at $OPENCODE_BIN" >&2
             exit 1
         fi
-        ln -sf "$OPENCODE_BIN" /usr/local/bin/opencode
+        if [[ -n "$OPENCODE_BIN" && "$OPENCODE_BIN" != "/usr/local/bin/opencode" ]]; then
+            ln -sf "$OPENCODE_BIN" /usr/local/bin/opencode
+        fi
         echo "OpenCode linked to /usr/local/bin/opencode"
         ;;
 

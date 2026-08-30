@@ -13,11 +13,6 @@ AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/cline"
 
 echo "Installing Cline CLI (version: ${VERSION})..."
 
-# Install curl and npm if not available
-if ! command -v curl &> /dev/null; then
-    apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-fi
-
 if ! command -v npm &> /dev/null; then
     echo "Error: npm is required to install Cline CLI. Add the node feature before this one." >&2
     exit 1
@@ -29,20 +24,20 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts cline@"${VERSION}"
 fi
+npm rebuild -g @anthropic-ai/cline 2>/dev/null || true
 
 # Locate the installed binary and copy it to /usr/local/bin
-CLINE_BIN="$(command -v cline || true)"
-if [[ -z "$CLINE_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    CLINE_BIN="$NPM_GLOBAL_BIN/cline"
-fi
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+CLINE_BIN="$NPM_GLOBAL_BIN/cline"
 
 if [[ ! -x "$CLINE_BIN" ]]; then
     echo "Cline CLI installation failed: binary not found at $CLINE_BIN" >&2
     exit 1
 fi
 
-ln -sf "$CLINE_BIN" /usr/local/bin/cline
+if [[ -n "$CLINE_BIN" && "$CLINE_BIN" != "/usr/local/bin/cline" ]]; then
+    ln -sf "$CLINE_BIN" /usr/local/bin/cline
+fi
 echo "Cline CLI linked to /usr/local/bin/cline"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled

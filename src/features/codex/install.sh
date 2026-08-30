@@ -28,21 +28,20 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts @openai/codex@"${VERSION}"
 fi
+npm rebuild -g @openai/codex 2>/dev/null || true
 
 # Locate the installed binary and copy it to /usr/local/bin for system-wide access
-CODEX_BIN="$(command -v codex || true)"
-if [[ -z "$CODEX_BIN" ]]; then
-    # npm global bin may not be on PATH during build; fall back to npm root
-    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    CODEX_BIN="$NPM_GLOBAL_BIN/codex"
-fi
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+CODEX_BIN="$NPM_GLOBAL_BIN/codex"
 
 if [[ ! -x "$CODEX_BIN" ]]; then
     echo "Codex CLI installation failed: binary not found at $CODEX_BIN" >&2
     exit 1
 fi
 
-ln -sf "$CODEX_BIN" /usr/local/bin/codex
+if [[ -n "$CODEX_BIN" && "$CODEX_BIN" != "/usr/local/bin/codex" ]]; then
+    ln -sf "$CODEX_BIN" /usr/local/bin/codex
+fi
 echo "Codex CLI linked to /usr/local/bin/codex"
 
 # Shared agent config

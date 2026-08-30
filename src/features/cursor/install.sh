@@ -53,6 +53,10 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
 export CURSOR_CONFIG_DIR="$AGENT_DIR"
 EOF
     chmod +x /etc/profile.d/cursor.sh
+else
+    # shareConfig is false — remove any pre-existing profile.d script
+    # so CURSOR_CONFIG_DIR is not set unconditionally.
+    rm -f /etc/profile.d/cursor.sh
 fi
 
 echo "Cursor Agent CLI installed successfully!"

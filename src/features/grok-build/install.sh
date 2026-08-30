@@ -25,15 +25,18 @@ fi
 # Run the upstream Grok installer
 # Download-then-execute instead of curl|bash (review finding)
 curl --proto =https --proto-redir =https -fsSL https://x.ai/cli/install.sh -o "$TMP_DIR/grok-install.sh"
-# Pass version to installer when specified (not latest)
-if [[ "$VERSION" != "latest" && -n "$VERSION" ]]; then
-    bash "$TMP_DIR/grok-install.sh" --version "$VERSION"
-else
-    bash "$TMP_DIR/grok-install.sh"
-fi
+# Set HOME explicitly so the installer places grok in $HOME/.grok/bin
+export HOME="${REMOTE_USER_HOME:-/home/vscode}"
+# The upstream Grok installer does NOT support --version as a flag; it treats
+# it as a positional version and rejects it. Pinned versions are not supported.
+bash "$TMP_DIR/grok-install.sh"
 
 # Locate the installed binary and link it to /usr/local/bin
 GROK_BIN="$(command -v grok || true)"
+if [[ -z "$GROK_BIN" ]]; then
+    # The upstream installer places grok in $HOME/.grok/bin; also check common locations
+    GROK_BIN="$(find "$HOME/.grok/bin" /usr/local/bin -name "grok" -type f -executable 2>/dev/null | head -1)"
+fi
 if [[ -z "$GROK_BIN" ]]; then
     # Installer may place the binary in ~/.local/bin; check common locations
     for candidate in "$REMOTE_USER_HOME/.local/bin/grok" "/usr/local/bin/grok" "/usr/bin/grok"; do
@@ -56,7 +59,7 @@ echo "Grok Build CLI linked to /usr/local/bin/grok"
 
 # Profile.d for login shells
 cat > /etc/profile.d/grok-build.sh << 'EOF'
-export GROK_HOME="${GROK_HOME:-/home/vscode/.grok}"
+export GROK_HOME="${GROK_HOME:-$HOME/.grok}"
 EOF
 chmod 0755 /etc/profile.d/grok-build.sh
 

@@ -33,6 +33,11 @@ esac
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+# Normalize VERSION: release tags are prefixed with "v" (e.g. v1.128.0)
+if [[ "$VERSION" != "latest" && -n "$VERSION" && "$VERSION" != v* ]]; then
+    VERSION="v${VERSION}"
+fi
+
 # Determine the download URL
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
     DOWNLOAD_URL="https://github.com/docker/docker-agent/releases/latest/download/docker-agent-linux-${DOCKER_AGENT_ARCH}"
@@ -41,34 +46,36 @@ else
 fi
 
 echo "Downloading: $DOWNLOAD_URL"
-if ! curl --proto =https -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/docker-agent"; then
+if ! curl --proto =https --proto-redir =https -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/docker-agent"; then
     echo "Error: Failed to download Docker Agent from $DOWNLOAD_URL" >&2
     exit 1
 fi
 
 # Download checksums and verify SHA-256 (CWE-494)
+# Docker Agent releases may not publish checksums.txt — warn and continue if absent.
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
     CHECKSUM_URL="https://github.com/docker/docker-agent/releases/latest/download/checksums.txt"
 else
     CHECKSUM_URL="https://github.com/docker/docker-agent/releases/download/${VERSION}/checksums.txt"
 fi
-if ! curl --proto =https -fsSL "$CHECKSUM_URL" -o "$TMP_DIR/checksums.txt" 2>/dev/null; then
-    echo "Error: Could not download checksums.txt for Docker Agent" >&2
-    exit 1
+if curl --proto =https --proto-redir =https -fsSL "$CHECKSUM_URL" -o "$TMP_DIR/checksums.txt" 2>/dev/null \
+    && [[ -s "$TMP_DIR/checksums.txt" ]]; then
+    expected=$(grep "docker-agent-linux-${DOCKER_AGENT_ARCH}" "$TMP_DIR/checksums.txt" | awk '{print $1}')
+    if [[ -n "$expected" ]]; then
+        actual=$(sha256sum "$TMP_DIR/docker-agent" | awk '{print $1}')
+        if [[ "$actual" != "$expected" ]]; then
+            echo "Error: SHA-256 checksum mismatch for docker-agent" >&2
+            echo "  expected: $expected" >&2
+            echo "  actual:   $actual" >&2
+            exit 1
+        fi
+        echo "Docker Agent SHA-256 checksum verified"
+    else
+        echo "WARNING: docker-agent-linux-${DOCKER_AGENT_ARCH} not found in checksums.txt; skipping checksum verification" >&2
+    fi
+else
+    echo "WARNING: checksums.txt not available for Docker Agent; skipping checksum verification" >&2
 fi
-expected=$(grep "docker-agent-linux-${DOCKER_AGENT_ARCH}" "$TMP_DIR/checksums.txt" | awk '{print $1}')
-if [[ -z "$expected" ]]; then
-    echo "Error: docker-agent-linux-${DOCKER_AGENT_ARCH} not found in checksums.txt" >&2
-    exit 1
-fi
-actual=$(sha256sum "$TMP_DIR/docker-agent" | awk '{print $1}')
-if [[ "$actual" != "$expected" ]]; then
-    echo "Error: SHA-256 checksum mismatch for docker-agent" >&2
-    echo "  expected: $expected" >&2
-    echo "  actual:   $actual" >&2
-    exit 1
-fi
-echo "Docker Agent SHA-256 checksum verified"
 
 # Install the binary to /usr/local/bin
 cp "$TMP_DIR/docker-agent" /usr/local/bin/docker-agent

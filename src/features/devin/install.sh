@@ -162,6 +162,15 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
     fi
 fi
 
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.devin" "$REMOTE_USER_HOME/.config/devin"; do
+        if [[ -L "$old_target" ]]; then
+            rm -f "$old_target"
+        fi
+    done
+fi
+
 set +e
 if command -v devin >/dev/null 2>&1; then
     OUT=$(devin --version 2>&1)

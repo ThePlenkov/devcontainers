@@ -26,17 +26,16 @@ else
     npm install -g --ignore-scripts @anthropic-ai/claude-code@"${VERSION}"
 fi
 # Explicitly run postinstall to install native binaries
-npm rebuild -g @anthropic-ai/claude-code 2>/dev/null || true
+npm rebuild -g @anthropic-ai/claude-code 2>&1 || { echo "Error: claude-code native binary setup failed" >&2; exit 1; }
 
 # Locate and link the binary to /usr/local/bin
-CLAUDE_BIN="$(command -v claude || true)"
-if [[ -z "$CLAUDE_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    CLAUDE_BIN="$NPM_GLOBAL_BIN/claude"
-fi
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+CLAUDE_BIN="$NPM_GLOBAL_BIN/claude"
 
 if [[ -x "$CLAUDE_BIN" ]]; then
-    ln -sf "$CLAUDE_BIN" /usr/local/bin/claude
+    if [[ -n "$CLAUDE_BIN" && "$CLAUDE_BIN" != "/usr/local/bin/claude" ]]; then
+        ln -sf "$CLAUDE_BIN" /usr/local/bin/claude
+    fi
     echo "Claude Code linked to /usr/local/bin/claude"
 else
     echo "Error: Claude Code binary not found at $CLAUDE_BIN" >&2

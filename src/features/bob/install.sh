@@ -17,6 +17,7 @@ if [[ "$VERSION" = "latest" ]]; then
 else
     npm install -g --ignore-scripts @roo-code/bob-shell@"$VERSION"
 fi
+npm rebuild -g @roo-code/bob-shell 2>/dev/null || true
 
 if command -v bob &> /dev/null; then
     echo "Bob Shell installed successfully!"
@@ -49,4 +50,13 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         done
     fi
     echo "Bob Shell configured to use $AGENT_DIR"
+fi
+
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.bob" "$REMOTE_USER_HOME/.config/bob"; do
+        if [[ -L "$old_target" ]]; then
+            rm -f "$old_target"
+        fi
+    done
 fi

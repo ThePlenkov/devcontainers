@@ -8,10 +8,11 @@ Apply these to every feature and PR.
 1. **Never write API keys to `/etc/environment`.** Credentials must be injected
    at runtime via env vars or secrets, not persisted in image layers.
 
-2. **Verify downloaded binaries with SHA-256.** Download `checksums.txt` from
-   the release, extract the expected hash for the target artifact, compute the
-   downloaded file's SHA-256, and abort on mismatch. If checksums are
-   unavailable, warn explicitly — do not silently skip.
+2. **Verify downloaded binaries with SHA-256 when checksums are available.**
+   Download `checksums.txt` from the release, extract the expected hash for
+   the target artifact, compute the downloaded file's SHA-256, and abort on
+   mismatch. If the upstream project does not publish checksums, print an
+   explicit warning and continue — do not silently skip verification.
 
 3. **Enforce HTTPS on all curl downloads.** Use `--proto =https` and
    `--proto-redir =https` to prevent HTTPS-to-HTTP downgrade redirects.
@@ -49,9 +50,10 @@ Apply these to every feature and PR.
     in `/usr/local/bin`, guard the `ln -sf` with:
     `if [[ -n "$BIN" && "$BIN" != "/usr/local/bin/X" ]]; then ln -sf ...`
 
-12. **Fail on missing checksums.** Do not use `|| true` on checksum download.
-    If checksums are unavailable, fail the build rather than installing
-    unverified artifacts.
+12. **Fail on missing checksums when the upstream publishes them.** If the
+    upstream project does not publish checksums at all, warn explicitly and
+    continue — do not silently skip. If checksums ARE published but cannot
+    be downloaded, fail the build.
 
 13. **Pass `VERSION` to installers.** When a feature has a `VERSION` option,
     pass it to the upstream installer for pinned installs. Only omit it for

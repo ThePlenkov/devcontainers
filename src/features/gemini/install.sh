@@ -25,16 +25,16 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
 else
     npm install -g --ignore-scripts @google/gemini-cli@"${VERSION}"
 fi
+npm rebuild -g @google/gemini-cli 2>/dev/null || true
 
 # Locate and link the binary to /usr/local/bin
-GEMINI_BIN="$(command -v gemini || true)"
-if [[ -z "$GEMINI_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    GEMINI_BIN="$NPM_GLOBAL_BIN/gemini"
-fi
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+GEMINI_BIN="$NPM_GLOBAL_BIN/gemini"
 
 if [[ -x "$GEMINI_BIN" ]]; then
-    ln -sf "$GEMINI_BIN" /usr/local/bin/gemini
+    if [[ -n "$GEMINI_BIN" && "$GEMINI_BIN" != "/usr/local/bin/gemini" ]]; then
+        ln -sf "$GEMINI_BIN" /usr/local/bin/gemini
+    fi
     echo "Gemini CLI linked to /usr/local/bin/gemini"
 else
     echo "Error: Gemini CLI binary not found at $GEMINI_BIN" >&2

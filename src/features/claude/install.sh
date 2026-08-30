@@ -41,6 +41,15 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
     fi
 fi
 
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
+        if [[ -L "$old_target" ]]; then
+            rm -f "$old_target"
+        fi
+    done
+fi
+
 # Usage examples
 mkdir -p /usr/local/share/claude-examples
 cat > /usr/local/share/claude-examples/usage.md << 'EOF'

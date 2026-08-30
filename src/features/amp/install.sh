@@ -30,7 +30,7 @@ else
     npm install -g --ignore-scripts @ampcode/cli@"${VERSION}"
 fi
 # Explicitly run postinstall to install native binaries
-npm rebuild -g @ampcode/cli 2>/dev/null || true
+npm rebuild -g @ampcode/cli 2>&1 || { echo "Error: amp native binary setup failed" >&2; exit 1; }
 
 # Locate the installed binary from npm's global bin directory (not PATH)
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
@@ -80,10 +80,12 @@ if command -v amp >/dev/null 2>&1; then
     if [[ $RC -eq 0 ]]; then
         echo "Amp CLI version: ${OUT}"
     else
-        echo "Amp CLI: version check skipped (exit ${RC})"
+        echo "Error: Amp CLI version check failed (exit ${RC})" >&2
+        exit 1
     fi
 else
-    echo "Amp CLI: binary not on PATH; skipping version check"
+    echo "Error: Amp CLI binary not on PATH" >&2
+    exit 1
 fi
 set -e
 

@@ -17,6 +17,11 @@ echo "Installing CAO — CLI Agent Orchestrator (version: ${VERSION})..."
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+# Install git explicitly (CAO uses git+https source which requires git)
+if ! command -v git &> /dev/null; then
+    apt-get update -y && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+fi
+
 # Install curl if not present
 if ! command -v curl &> /dev/null; then
     apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
@@ -25,6 +30,11 @@ fi
 # Install tmux if not present (required by CAO for session orchestration)
 if ! command -v tmux &> /dev/null; then
     apt-get update -y && apt-get install -y tmux && rm -rf /var/lib/apt/lists/*
+fi
+# CAO requires tmux 3.3+; warn if the installed version is too old
+TMUX_VERSION=$(tmux -V 2>/dev/null | awk '{print $2}')
+if [[ -n "$TMUX_VERSION" ]] && [[ "$(echo "$TMUX_VERSION" | cut -d. -f1)" -lt 3 || ( "$(echo "$TMUX_VERSION" | cut -d. -f1)" -eq 3 && "$(echo "$TMUX_VERSION" | cut -d. -f2)" -lt 3 ) ]]; then
+    echo "Warning: CAO requires tmux 3.3+, found $TMUX_VERSION. Orchestration may fail." >&2
 fi
 
 # Install uv if not present (required to install CAO)
@@ -36,6 +46,8 @@ if ! command -v uv &> /dev/null; then
     UV_TMP_SCRIPT="$TMP_DIR/uv-install.sh"
     curl --proto =https --proto-redir =https -LsSf https://astral.sh/uv/install.sh -o "$UV_TMP_SCRIPT"
     sh "$UV_TMP_SCRIPT"
+    # Add uv to PATH (installer with UV_INSTALL_DIR=/usr/local places uv in /usr/local/bin)
+    export PATH="/usr/local/bin:$PATH"
 fi
 
 # Determine the install ref (branch/tag)

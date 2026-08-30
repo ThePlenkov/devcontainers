@@ -25,12 +25,9 @@ fi
 # Run the upstream Hermes installer (non-interactive, skip initial setup)
 # Download-then-execute instead of curl|bash (review finding)
 curl --proto =https --proto-redir =https -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$TMP_DIR/hermes-install.sh"
-# Pass version to installer when specified (not latest)
-if [[ "$VERSION" != "latest" && -n "$VERSION" ]]; then
-    bash "$TMP_DIR/hermes-install.sh" --non-interactive --skip-setup --version "$VERSION"
-else
-    bash "$TMP_DIR/hermes-install.sh" --non-interactive --skip-setup
-fi
+# The upstream Hermes installer does NOT support --version; it rejects the
+# flag and exits. Pinned versions are not supported by the upstream installer.
+bash "$TMP_DIR/hermes-install.sh" --non-interactive --skip-setup
 
 # Locate the installed binary and link it to /usr/local/bin
 HERMES_BIN="$(command -v hermes || true)"
@@ -49,13 +46,15 @@ if [[ -z "$HERMES_BIN" || ! -x "$HERMES_BIN" ]]; then
     exit 1
 fi
 
-ln -sf "$HERMES_BIN" /usr/local/bin/hermes
+if [[ -n "$HERMES_BIN" && "$HERMES_BIN" != "/usr/local/bin/hermes" ]]; then
+    ln -sf "$HERMES_BIN" /usr/local/bin/hermes
+fi
 chmod +x /usr/local/bin/hermes
 echo "Hermes CLI linked to /usr/local/bin/hermes"
 
 # Profile.d for login shells
 cat > /etc/profile.d/hermes.sh << 'EOF'
-export HERMES_HOME="${HERMES_HOME:-/home/vscode/.hermes}"
+export HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
 EOF
 chmod 0755 /etc/profile.d/hermes.sh
 

@@ -30,7 +30,7 @@ else
     npm install -g --ignore-scripts openclaw@"${VERSION}"
 fi
 # Explicitly run postinstall to install native binaries
-npm rebuild -g openclaw 2>/dev/null || true
+npm rebuild -g openclaw 2>&1 || { echo "Error: openclaw native binary setup failed" >&2; exit 1; }
 
 # Locate the installed binary from npm's global bin directory (not PATH)
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
@@ -46,7 +46,7 @@ echo "OpenClaw CLI linked to /usr/local/bin/openclaw"
 
 # Profile.d for login shells
 cat > /etc/profile.d/openclaw.sh << 'EOF'
-export OPENCLAW_STATE_DIR="${OPENCLAW_STATE_DIR:-/home/vscode/.openclaw}"
+export OPENCLAW_STATE_DIR="${OPENCLAW_STATE_DIR:-$HOME/.openclaw}"
 EOF
 chmod 0755 /etc/profile.d/openclaw.sh
 

@@ -35,7 +35,9 @@ if [[ ! -x "$QWEN_BIN" ]]; then
     exit 1
 fi
 
-ln -sf "$QWEN_BIN" /usr/local/bin/qwen
+if [[ -n "$QWEN_BIN" && "$QWEN_BIN" != "/usr/local/bin/qwen" ]]; then
+    ln -sf "$QWEN_BIN" /usr/local/bin/qwen
+fi
 echo "Qwen Code CLI linked to /usr/local/bin/qwen"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled

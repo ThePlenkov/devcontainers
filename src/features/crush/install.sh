@@ -26,17 +26,16 @@ else
     npm install -g --ignore-scripts @charmland/crush@"${VERSION}"
 fi
 # Explicitly run postinstall to install native binaries
-npm rebuild -g @charmland/crush 2>/dev/null || true
+npm rebuild -g @charmland/crush 2>&1 || { echo "Error: crush native binary setup failed" >&2; exit 1; }
 
 # Locate and link the binary to /usr/local/bin
-CRUSH_BIN="$(command -v crush || true)"
-if [[ -z "$CRUSH_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    CRUSH_BIN="$NPM_GLOBAL_BIN/crush"
-fi
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+CRUSH_BIN="$NPM_GLOBAL_BIN/crush"
 
 if [[ -x "$CRUSH_BIN" ]]; then
-    ln -sf "$CRUSH_BIN" /usr/local/bin/crush
+    if [[ -n "$CRUSH_BIN" && "$CRUSH_BIN" != "/usr/local/bin/crush" ]]; then
+        ln -sf "$CRUSH_BIN" /usr/local/bin/crush
+    fi
     echo "Crush linked to /usr/local/bin/crush"
 else
     echo "Error: Crush binary not found at $CRUSH_BIN" >&2

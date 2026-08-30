@@ -13,11 +13,7 @@ AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/mastra-code"
 
 echo "Installing Mastra Code CLI (version: ${VERSION})..."
 
-# Install curl and npm if not available
-if ! command -v curl &> /dev/null; then
-    apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-fi
-
+# Install npm if not available
 if ! command -v npm &> /dev/null; then
     echo "Error: npm is required to install Mastra Code CLI. Add the node feature before this one." >&2
     exit 1

@@ -1,0 +1,26 @@
+{
+  "id": "amp",
+  "version": "1.0.0",
+  "name": "Amp",
+  "description": "Install Amp from Sourcegraph — a frontier AI agent and development environment CLI.",
+  "documentationURL": "https://sourcegraph.com/amp",
+  "keywords": ["ai","amp","sourcegraph","agent","cli","coding"],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version to install"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils","ghcr.io/devcontainers/features/node","ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

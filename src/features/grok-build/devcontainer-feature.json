@@ -1,0 +1,26 @@
+{
+  "id": "grok-build",
+  "version": "1.0.0",
+  "name": "Grok Build",
+  "description": "Install Grok Build from xAI — a coding agent harness and TUI with fullscreen mouse-interactive interface.",
+  "documentationURL": "https://github.com/xai-org/grok-build",
+  "keywords": ["ai","grok","xai","agent","cli","coding"],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version to install"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils","ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

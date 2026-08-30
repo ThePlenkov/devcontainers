@@ -1,0 +1,26 @@
+{
+  "id": "cao",
+  "version": "1.0.0",
+  "name": "CLI Agent Orchestrator (CAO)",
+  "description": "Install AWS Labs CLI Agent Orchestrator — multi-agent orchestration for AI coding CLIs (Claude Code, Codex, Kiro, Hermes, etc.) coordinated in isolated tmux sessions.",
+  "documentationURL": "https://github.com/awslabs/cli-agent-orchestrator",
+  "keywords": ["ai","cao","orchestrator","aws","agent","cli","multi-agent"],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version to install"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils","ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

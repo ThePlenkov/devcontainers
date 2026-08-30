@@ -32,7 +32,12 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 # Determine the release tag
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    RELEASE_TAG=$(curl --proto =https -fsSL "https://api.github.com/repos/aaif-goose/goose/releases/latest" 2>/dev/null | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4)
+    API_RESPONSE=$(curl --proto =https -fsSL "https://api.github.com/repos/aaif-goose/goose/releases/latest" 2>/dev/null)
+    if command -v jq &> /dev/null; then
+        RELEASE_TAG=$(echo "$API_RESPONSE" | jq -r '.tag_name' 2>/dev/null)
+    else
+        RELEASE_TAG=$(echo "$API_RESPONSE" | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4)
+    fi
     if [[ -z "$RELEASE_TAG" ]]; then
         echo "Error: Could not determine latest Goose release tag" >&2
         exit 1

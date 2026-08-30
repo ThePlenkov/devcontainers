@@ -30,15 +30,12 @@ else
     npm install -g --ignore-scripts mastracode@"${VERSION}"
 fi
 
-# Locate the installed binary and copy it to /usr/local/bin
-MASTRACODE_BIN="$(command -v mastracode || true)"
-if [[ -z "$MASTRACODE_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
-    if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
-        NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    fi
-    MASTRACODE_BIN="$NPM_GLOBAL_BIN/mastracode"
+# Locate the installed binary from npm's global bin directory (not PATH)
+NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
+if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
+    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
 fi
+MASTRACODE_BIN="$NPM_GLOBAL_BIN/mastracode"
 
 if [[ ! -x "$MASTRACODE_BIN" ]]; then
     echo "Mastra Code CLI installation failed: binary not found at $MASTRACODE_BIN" >&2

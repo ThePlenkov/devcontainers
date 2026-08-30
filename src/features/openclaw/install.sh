@@ -32,15 +32,12 @@ fi
 # Explicitly run postinstall to install native binaries
 npm rebuild -g openclaw 2>/dev/null || true
 
-# Locate the installed binary and copy it to /usr/local/bin
-OPENCLAW_BIN="$(command -v openclaw || true)"
-if [[ -z "$OPENCLAW_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
-    if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
-        NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    fi
-    OPENCLAW_BIN="$NPM_GLOBAL_BIN/openclaw"
+# Locate the installed binary from npm's global bin directory (not PATH)
+NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
+if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
+    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
 fi
+OPENCLAW_BIN="$NPM_GLOBAL_BIN/openclaw"
 
 if [[ ! -x "$OPENCLAW_BIN" ]]; then
     echo "OpenClaw CLI installation failed: binary not found at $OPENCLAW_BIN" >&2

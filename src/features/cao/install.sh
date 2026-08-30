@@ -13,6 +13,10 @@ AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/cao"
 
 echo "Installing CAO — CLI Agent Orchestrator (version: ${VERSION})..."
 
+# Temp dir for downloaded installers (CWE-377)
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT
+
 # Install curl if not present
 if ! command -v curl &> /dev/null; then
     apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
@@ -28,7 +32,10 @@ fi
 if ! command -v uv &> /dev/null; then
     echo "uv not found; installing uv..."
     export UV_INSTALL_DIR="/usr/local"
-    curl --proto =https -LsSf https://astral.sh/uv/install.sh | sh
+    # Download-then-execute instead of curl|sh (review finding)
+    UV_TMP_SCRIPT="$TMP_DIR/uv-install.sh"
+    curl --proto =https --proto-redir =https -LsSf https://astral.sh/uv/install.sh -o "$UV_TMP_SCRIPT"
+    sh "$UV_TMP_SCRIPT"
 fi
 
 # Determine the install ref (branch/tag)

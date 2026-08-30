@@ -25,10 +25,12 @@ fi
 
 # Install OpenClaw CLI globally via npm
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g openclaw@latest
+    npm install -g --ignore-scripts openclaw@latest
 else
-    npm install -g openclaw@"${VERSION}"
+    npm install -g --ignore-scripts openclaw@"${VERSION}"
 fi
+# Explicitly run postinstall to install native binaries
+npm rebuild -g openclaw 2>/dev/null || true
 
 # Locate the installed binary and copy it to /usr/local/bin
 OPENCLAW_BIN="$(command -v openclaw || true)"

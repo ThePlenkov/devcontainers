@@ -28,10 +28,12 @@ case "$INSTALL_METHOD" in
             exit 1
         fi
         if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-            npm install -g opencode-ai
+            npm install -g --ignore-scripts opencode-ai
         else
-            npm install -g opencode-ai@"${VERSION}"
+            npm install -g --ignore-scripts opencode-ai@"${VERSION}"
         fi
+        # Explicitly run postinstall to install native binaries
+        npm rebuild -g opencode-ai 2>/dev/null || true
         # Copy binary to /usr/local/bin for system-wide access
         OPENCODE_BIN="$(command -v opencode || true)"
         if [[ -z "$OPENCODE_BIN" ]]; then

@@ -25,10 +25,12 @@ fi
 
 # Install Amp CLI globally via npm
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g @ampcode/cli
+    npm install -g --ignore-scripts @ampcode/cli
 else
-    npm install -g @ampcode/cli@"${VERSION}"
+    npm install -g --ignore-scripts @ampcode/cli@"${VERSION}"
 fi
+# Explicitly run postinstall to install native binaries
+npm rebuild -g @ampcode/cli 2>/dev/null || true
 
 # Locate the installed binary and copy it to /usr/local/bin
 AMP_BIN="$(command -v amp || true)"

@@ -32,6 +32,7 @@ if ! command -v uv &> /dev/null; then
 fi
 
 # Determine the install ref (branch/tag)
+# Pin to a specific ref for reproducibility; use main for latest
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
     CAO_REF="main"
 else
@@ -59,8 +60,10 @@ if [[ -z "$CAO_BIN" || ! -x "$CAO_BIN" ]]; then
     exit 1
 fi
 
-ln -sf "$CAO_BIN" /usr/local/bin/cao
-chmod +x /usr/local/bin/cao
+if [[ -n "$CAO_BIN" && "$CAO_BIN" != "/usr/local/bin/cao" ]]; then
+    ln -sf "$CAO_BIN" /usr/local/bin/cao
+fi
+chmod +x /usr/local/bin/cao 2>/dev/null || true
 echo "CAO linked to /usr/local/bin/cao"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled

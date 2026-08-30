@@ -24,8 +24,13 @@ fi
 
 # Run the upstream Grok installer
 # Download-then-execute instead of curl|bash (review finding)
-curl --proto =https -fsSL https://x.ai/cli/install.sh -o "$TMP_DIR/grok-install.sh"
-bash "$TMP_DIR/grok-install.sh"
+curl --proto =https --proto-redir =https -fsSL https://x.ai/cli/install.sh -o "$TMP_DIR/grok-install.sh"
+# Pass version to installer when specified (not latest)
+if [[ "$VERSION" != "latest" && -n "$VERSION" ]]; then
+    bash "$TMP_DIR/grok-install.sh" --version "$VERSION"
+else
+    bash "$TMP_DIR/grok-install.sh"
+fi
 
 # Locate the installed binary and link it to /usr/local/bin
 GROK_BIN="$(command -v grok || true)"

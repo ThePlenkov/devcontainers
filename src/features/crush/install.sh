@@ -21,10 +21,12 @@ fi
 
 # Install Crush globally
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g @charmland/crush
+    npm install -g --ignore-scripts @charmland/crush
 else
-    npm install -g @charmland/crush@"${VERSION}"
+    npm install -g --ignore-scripts @charmland/crush@"${VERSION}"
 fi
+# Explicitly run postinstall to install native binaries
+npm rebuild -g @charmland/crush 2>/dev/null || true
 
 # Locate and link the binary to /usr/local/bin
 CRUSH_BIN="$(command -v crush || true)"

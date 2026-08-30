@@ -21,10 +21,12 @@ fi
 
 # Install Claude Code globally
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g @anthropic-ai/claude-code
+    npm install -g --ignore-scripts @anthropic-ai/claude-code
 else
-    npm install -g @anthropic-ai/claude-code@"${VERSION}"
+    npm install -g --ignore-scripts @anthropic-ai/claude-code@"${VERSION}"
 fi
+# Explicitly run postinstall to install native binaries
+npm rebuild -g @anthropic-ai/claude-code 2>/dev/null || true
 
 # Locate and link the binary to /usr/local/bin
 CLAUDE_BIN="$(command -v claude || true)"

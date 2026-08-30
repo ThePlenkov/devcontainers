@@ -26,15 +26,12 @@ else
     npm install -g --ignore-scripts @qwen-code/qwen-code@"${VERSION}"
 fi
 
-# Locate the installed binary and copy it to /usr/local/bin
-QWEN_BIN="$(command -v qwen || true)"
-if [[ -z "$QWEN_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
-    if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
-        NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    fi
-    QWEN_BIN="$NPM_GLOBAL_BIN/qwen"
+# Locate the installed binary from npm's global bin directory (not PATH)
+NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
+if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
+    NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
 fi
+QWEN_BIN="$NPM_GLOBAL_BIN/qwen"
 
 if [[ ! -x "$QWEN_BIN" ]]; then
     echo "Qwen Code CLI installation failed: binary not found at $QWEN_BIN" >&2

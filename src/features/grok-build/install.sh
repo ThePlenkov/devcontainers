@@ -44,8 +44,9 @@ if [[ -z "$GROK_BIN" || ! -x "$GROK_BIN" ]]; then
     exit 1
 fi
 
-ln -sf "$GROK_BIN" /usr/local/bin/grok
-chmod +x /usr/local/bin/grok
+if [[ -n "$GROK_BIN" && "$GROK_BIN" != "/usr/local/bin/grok" ]]; then
+    ln -sf "$GROK_BIN" /usr/local/bin/grok
+fi
 echo "Grok Build CLI linked to /usr/local/bin/grok"
 
 # Profile.d for login shells

@@ -11,11 +11,6 @@
     "llm"
   ],
   "options": {
-    "apiKey": {
-      "type": "string",
-      "default": "",
-      "description": "Anthropic API key (or set ANTHROPIC_API_KEY env var)"
-    },
     "shareConfig": {
       "type": "boolean",
       "default": false,

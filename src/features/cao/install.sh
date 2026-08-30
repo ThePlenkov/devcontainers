@@ -24,14 +24,11 @@ if ! command -v tmux &> /dev/null; then
 fi
 
 # Install uv if not present (required to install CAO)
+# Use UV_INSTALL_DIR=/usr/local so uv and its tools are system-wide accessible
 if ! command -v uv &> /dev/null; then
     echo "uv not found; installing uv..."
+    export UV_INSTALL_DIR="/usr/local"
     curl --proto =https -LsSf https://astral.sh/uv/install.sh | sh
-    export PATH="$HOME/.local/bin:$PATH"
-    # Also make uv available system-wide
-    if [[ -x "$HOME/.local/bin/uv" ]]; then
-        ln -sf "$HOME/.local/bin/uv" /usr/local/bin/uv
-    fi
 fi
 
 # Determine the install ref (branch/tag)
@@ -42,13 +39,14 @@ else
 fi
 
 # Install CAO via uv tool install
-uv tool install "git+https://github.com/awslabs/cli-agent-orchestrator.git@${CAO_REF}" --upgrade
+# With UV_INSTALL_DIR=/usr/local, uv tools are installed to /usr/local/bin
+uv tool install --python auto "git+https://github.com/awslabs/cli-agent-orchestrator.git@${CAO_REF}" --upgrade
 
 # Locate the installed binary and link it to /usr/local/bin
 CAO_BIN="$(command -v cao || true)"
 if [[ -z "$CAO_BIN" ]]; then
-    # uv installs tools to ~/.local/bin
-    for candidate in "$HOME/.local/bin/cao" "$REMOTE_USER_HOME/.local/bin/cao"; do
+    # uv may install tools to ~/.local/bin or /usr/local/bin depending on config
+    for candidate in "/usr/local/bin/cao" "$HOME/.local/bin/cao" "$REMOTE_USER_HOME/.local/bin/cao"; do
         if [[ -x "$candidate" ]]; then
             CAO_BIN="$candidate"
             break

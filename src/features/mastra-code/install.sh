@@ -45,9 +45,8 @@ if [[ ! -x "$MASTRACODE_BIN" ]]; then
     exit 1
 fi
 
-cp "$MASTRACODE_BIN" /usr/local/bin/mastracode
-chmod +x /usr/local/bin/mastracode
-echo "Mastra Code CLI copied to /usr/local/bin/mastracode"
+ln -sf "$MASTRACODE_BIN" /usr/local/bin/mastracode
+echo "Mastra Code CLI linked to /usr/local/bin/mastracode"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then

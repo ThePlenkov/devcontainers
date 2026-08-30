@@ -25,9 +25,9 @@ fi
 
 # Install OpenClaw CLI globally via npm
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g --ignore-scripts openclaw@latest
+    npm install -g openclaw@latest
 else
-    npm install -g --ignore-scripts openclaw@"${VERSION}"
+    npm install -g openclaw@"${VERSION}"
 fi
 
 # Locate the installed binary and copy it to /usr/local/bin
@@ -45,9 +45,8 @@ if [[ ! -x "$OPENCLAW_BIN" ]]; then
     exit 1
 fi
 
-cp "$OPENCLAW_BIN" /usr/local/bin/openclaw
-chmod +x /usr/local/bin/openclaw
-echo "OpenClaw CLI copied to /usr/local/bin/openclaw"
+ln -sf "$OPENCLAW_BIN" /usr/local/bin/openclaw
+echo "OpenClaw CLI linked to /usr/local/bin/openclaw"
 
 # Profile.d for login shells
 cat > /etc/profile.d/openclaw.sh << 'EOF'

@@ -45,9 +45,8 @@ if [[ ! -x "$CLINE_BIN" ]]; then
     exit 1
 fi
 
-cp "$CLINE_BIN" /usr/local/bin/cline
-chmod +x /usr/local/bin/cline
-echo "Cline CLI copied to /usr/local/bin/cline"
+ln -sf "$CLINE_BIN" /usr/local/bin/cline
+echo "Cline CLI linked to /usr/local/bin/cline"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then

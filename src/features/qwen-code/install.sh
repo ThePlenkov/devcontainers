@@ -13,11 +13,7 @@ AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/qwen-code"
 
 echo "Installing Qwen Code CLI (version: ${VERSION})..."
 
-# Install curl and npm if not available
-if ! command -v curl &> /dev/null; then
-    apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-fi
-
+# Ensure npm is available
 if ! command -v npm &> /dev/null; then
     echo "Error: npm is required to install Qwen Code CLI. Add the node feature before this one." >&2
     exit 1
@@ -45,9 +41,8 @@ if [[ ! -x "$QWEN_BIN" ]]; then
     exit 1
 fi
 
-cp "$QWEN_BIN" /usr/local/bin/qwen
-chmod +x /usr/local/bin/qwen
-echo "Qwen Code CLI copied to /usr/local/bin/qwen"
+ln -sf "$QWEN_BIN" /usr/local/bin/qwen
+echo "Qwen Code CLI linked to /usr/local/bin/qwen"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then

@@ -25,7 +25,7 @@ fi
 # Run the upstream Hermes installer (non-interactive, skip initial setup)
 # Download-then-execute instead of curl|bash (review finding)
 curl --proto =https -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$TMP_DIR/hermes-install.sh"
-bash "$TMP_DIR/hermes-install.sh" -s -- --non-interactive --skip-setup
+bash "$TMP_DIR/hermes-install.sh" --non-interactive --skip-setup
 
 # Locate the installed binary and link it to /usr/local/bin
 HERMES_BIN="$(command -v hermes || true)"

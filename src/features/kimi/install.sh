@@ -45,9 +45,8 @@ if [[ ! -x "$KIMI_BIN" ]]; then
     exit 1
 fi
 
-cp "$KIMI_BIN" /usr/local/bin/kimi
-chmod +x /usr/local/bin/kimi
-echo "Kimi Code CLI copied to /usr/local/bin/kimi"
+ln -sf "$KIMI_BIN" /usr/local/bin/kimi
+echo "Kimi Code CLI linked to /usr/local/bin/kimi"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then

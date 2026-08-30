@@ -28,9 +28,9 @@ case "$INSTALL_METHOD" in
             exit 1
         fi
         if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-            npm install -g --ignore-scripts opencode-ai
+            npm install -g opencode-ai
         else
-            npm install -g --ignore-scripts opencode-ai@"${VERSION}"
+            npm install -g opencode-ai@"${VERSION}"
         fi
         # Copy binary to /usr/local/bin for system-wide access
         OPENCODE_BIN="$(command -v opencode || true)"
@@ -49,9 +49,8 @@ case "$INSTALL_METHOD" in
             echo "OpenCode installation failed: binary not found at $OPENCODE_BIN" >&2
             exit 1
         fi
-        cp "$OPENCODE_BIN" /usr/local/bin/opencode
-        chmod +x /usr/local/bin/opencode
-        echo "OpenCode copied to /usr/local/bin/opencode"
+        ln -sf "$OPENCODE_BIN" /usr/local/bin/opencode
+        echo "OpenCode linked to /usr/local/bin/opencode"
         ;;
 
     script)
@@ -74,10 +73,9 @@ case "$INSTALL_METHOD" in
             OPENCODE_BIN="$HOME/.local/bin/opencode"
         fi
         if [[ -x "$OPENCODE_BIN" ]] && [[ "$(readlink -f "$OPENCODE_BIN")" != "/usr/local/bin/opencode" ]]; then
-            cp "$OPENCODE_BIN" /usr/local/bin/opencode
-            chmod +x /usr/local/bin/opencode
+            ln -sf "$OPENCODE_BIN" /usr/local/bin/opencode
         fi
-        echo "OpenCode copied to /usr/local/bin/opencode"
+        echo "OpenCode linked to /usr/local/bin/opencode"
         ;;
 
     *)

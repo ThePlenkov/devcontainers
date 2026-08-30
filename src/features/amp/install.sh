@@ -25,9 +25,9 @@ fi
 
 # Install Amp CLI globally via npm
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g --ignore-scripts @ampcode/cli
+    npm install -g @ampcode/cli
 else
-    npm install -g --ignore-scripts @ampcode/cli@"${VERSION}"
+    npm install -g @ampcode/cli@"${VERSION}"
 fi
 
 # Locate the installed binary and copy it to /usr/local/bin
@@ -45,9 +45,8 @@ if [[ ! -x "$AMP_BIN" ]]; then
     exit 1
 fi
 
-cp "$AMP_BIN" /usr/local/bin/amp
-chmod +x /usr/local/bin/amp
-echo "Amp CLI copied to /usr/local/bin/amp"
+ln -sf "$AMP_BIN" /usr/local/bin/amp
+echo "Amp CLI linked to /usr/local/bin/amp"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then

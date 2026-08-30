@@ -54,7 +54,10 @@ if ! curl --proto =https -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/goose.tar.gz"; then
 fi
 
 # Download checksums and verify SHA256 (CWE-494)
-curl --proto =https -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt" || true
+if ! curl --proto =https -fsSL "https://github.com/aaif-goose/goose/releases/download/${RELEASE_TAG}/checksums.txt" -o "$TMP_DIR/checksums.txt"; then
+    echo "Error: Could not download checksums file for $RELEASE_TAG" >&2
+    exit 1
+fi
 if [[ -f "$TMP_DIR/checksums.txt" ]]; then
     expected=$(grep "$TARBALL" "$TMP_DIR/checksums.txt" | awk '{print $1}')
     if [[ -n "$expected" ]]; then

@@ -45,9 +45,8 @@ if [[ ! -x "$CODEX_BIN" ]]; then
     exit 1
 fi
 
-cp "$CODEX_BIN" /usr/local/bin/codex
-chmod +x /usr/local/bin/codex
-echo "Codex CLI copied to /usr/local/bin/codex"
+ln -sf "$CODEX_BIN" /usr/local/bin/codex
+echo "Codex CLI linked to /usr/local/bin/codex"
 
 # Shared agent config
 if [[ "$SHARE_CONFIG" == "true" ]]; then

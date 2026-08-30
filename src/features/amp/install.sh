@@ -35,10 +35,7 @@ npm rebuild -g @ampcode/cli 2>/dev/null || true
 # Locate the installed binary and copy it to /usr/local/bin
 AMP_BIN="$(command -v amp || true)"
 if [[ -z "$AMP_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
-    if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
-        NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    fi
+    NPM_GLOBAL_BIN="1000 4 24 27 30 46 100 1000 1001npm config get prefix 2>/dev/null || true)/bin"
     AMP_BIN="$NPM_GLOBAL_BIN/amp"
 fi
 

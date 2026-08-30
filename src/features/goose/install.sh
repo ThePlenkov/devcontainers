@@ -85,7 +85,7 @@ if [[ -z "$GOOSE_BIN" ]]; then
     exit 1
 fi
 
-ln -sf "$GOOSE_BIN" /usr/local/bin/goose
+cp "$GOOSE_BIN" /usr/local/bin/goose
 chmod +x /usr/local/bin/goose
 echo "Goose CLI installed to /usr/local/bin/goose"
 

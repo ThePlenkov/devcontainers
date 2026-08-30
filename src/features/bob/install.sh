@@ -48,6 +48,5 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             fi
         done
     fi
+    echo "Bob Shell configured to use $AGENT_DIR"
 fi
-
-echo "Bob Shell configured to use $AGENT_DIR"

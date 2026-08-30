@@ -33,10 +33,7 @@ fi
 # Locate the installed binary and copy it to /usr/local/bin
 KIMI_BIN="$(command -v kimi || true)"
 if [[ -z "$KIMI_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
-    if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
-        NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    fi
+    NPM_GLOBAL_BIN="1000 4 24 27 30 46 100 1000 1001npm config get prefix 2>/dev/null || true)/bin"
     KIMI_BIN="$NPM_GLOBAL_BIN/kimi"
 fi
 

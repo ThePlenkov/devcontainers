@@ -29,10 +29,7 @@ fi
 # Locate and link the binary to /usr/local/bin
 GEMINI_BIN="$(command -v gemini || true)"
 if [[ -z "$GEMINI_BIN" ]]; then
-    NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
-    if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
-        NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-    fi
+    NPM_GLOBAL_BIN="1000 4 24 27 30 46 100 1000 1001npm config get prefix 2>/dev/null || true)/bin"
     GEMINI_BIN="$NPM_GLOBAL_BIN/gemini"
 fi
 

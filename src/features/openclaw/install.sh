@@ -25,9 +25,9 @@ fi
 
 # Install OpenClaw CLI globally via npm
 if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-    npm install -g openclaw@latest --allow-scripts=openclaw
+    npm install -g --ignore-scripts openclaw@latest
 else
-    npm install -g openclaw@"${VERSION}" --allow-scripts=openclaw
+    npm install -g --ignore-scripts openclaw@"${VERSION}"
 fi
 
 # Locate the installed binary and copy it to /usr/local/bin

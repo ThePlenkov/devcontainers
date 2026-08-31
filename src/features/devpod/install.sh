@@ -14,7 +14,7 @@ APT_PKGS=""
 command -v curl >/dev/null 2>&1 || APT_PKGS="curl"
 command -v tar >/dev/null 2>&1 || APT_PKGS="$APT_PKGS tar"
 APT_PKGS="${APT_PKGS# }"
-if [ -n "$APT_PKGS" ]; then
+if [[ -n "$APT_PKGS" ]]; then
   # shellcheck disable=SC2086
   apt-get update -y && apt-get install -y $APT_PKGS && rm -rf /var/lib/apt/lists/*
 fi
@@ -54,10 +54,10 @@ trap 'rm -f "$DEVPOD_TMP"; rm -rf "$DEVPOD_EXTRACT_DIR"' EXIT
 curl -fsSL --proto =https "$DEVPOD_URL" -o "$DEVPOD_TMP"
 printf '%s  %s\n' "$DEVPOD_SHA256" "$DEVPOD_TMP" | sha256sum -c -
 
-if [ "$DEVPOD_IS_TARGZ" = "1" ]; then
+if [[ "$DEVPOD_IS_TARGZ" = "1" ]]; then
   tar -xzf "$DEVPOD_TMP" -C "$DEVPOD_EXTRACT_DIR"
   # The tar.gz contains the CLI at usr/bin/devpod-cli (not a root-level binary).
-  if [ -f "$DEVPOD_EXTRACT_DIR/usr/bin/devpod-cli" ]; then
+  if [[ -f "$DEVPOD_EXTRACT_DIR/usr/bin/devpod-cli" ]]; then
     install -m 755 "$DEVPOD_EXTRACT_DIR/usr/bin/devpod-cli" /usr/local/bin/devpod
     install -m 755 "$DEVPOD_EXTRACT_DIR/usr/bin/devpod-cli" "$REMOTE_USER_HOME/.local/bin/devpod"
     install -m 755 "$DEVPOD_EXTRACT_DIR/usr/bin/devpod-cli" /etc/skel/.local/bin/devpod

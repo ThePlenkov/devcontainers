@@ -1,0 +1,36 @@
+{
+  "id": "kimi",
+  "version": "1.0.0",
+  "name": "Kimi Code",
+  "description": "Install Kimi Code from Moonshot AI — an open-source AI coding agent that lives in your terminal.",
+  "documentationURL": "https://github.com/moonshot-ai/kimi-code",
+  "keywords": [
+    "ai",
+    "kimi",
+    "moonshot",
+    "agent",
+    "cli",
+    "coding"
+  ],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version to install"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {},
+    "ghcr.io/devcontainers/features/node": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

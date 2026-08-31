@@ -54,12 +54,21 @@ omit the `_REMOTE_USER` chain below — that's expected.
 - Expose installed binaries globally via `ln -sf ... /usr/local/bin/<name>`.
 - Put env exports in `/etc/profile.d/<feature>.sh` (chmod 0755) **and**
   `/etc/environment` for non-login shells.
-- Share config across agent features via `AGENT_CONFIG_DIR`:
+- Share config across agent features via `AGENT_CONFIG_DIR`, gated by a
+  `shareConfig` boolean option (default `false`):
   ```bash
+  SHARE_CONFIG="${SHARECONFIG:-false}"
   AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/<id>"
+  if [[ "$SHARE_CONFIG" == "true" ]]; then
+      # symlink $REMOTE_USER_HOME/.config/<id> → $AGENT_DIR
+  fi
   ```
-  Then symlink `$REMOTE_USER_HOME/.config/<id>` → `$AGENT_DIR` so per-user
-  tools find a shared, PVC-safe config.
+  When `shareConfig` is `false` (default), the agent uses its native config
+  location with no sharing. When `true`, config is symlinked to the shared
+  `AGENT_CONFIG_DIR` so it persists across container rebuilds and can be
+  shared with other agents. Every agent feature that manages a config
+  directory SHOULD have this option. Features that don't manage config
+  (e.g. runtimes, build tools) may omit it.
 - Run user-scoped install steps as the remote user (`su -s /bin/bash -` or
   `sudo -u`), not as root, so file ownership is correct.
 - Keep `apt-get` calls consolidated: one `apt-get update`, one

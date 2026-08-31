@@ -1,6 +1,6 @@
 {
   "id": "claude",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "name": "Anthropic Claude",
   "description": "Configure Anthropic Claude SDK and share the agent config folder with other agents.",
   "documentationURL": "https://docs.anthropic.com",
@@ -11,10 +11,10 @@
     "llm"
   ],
   "options": {
-    "apiKey": {
-      "type": "string",
-      "default": "",
-      "description": "Anthropic API key (or set ANTHROPIC_API_KEY env var)"
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent's config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
     }
   },
   "dependsOn": {

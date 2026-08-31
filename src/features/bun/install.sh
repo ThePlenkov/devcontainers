@@ -29,8 +29,10 @@ else
 fi
 
 # Expose bun binary globally on PATH for all users.
-if [ -x "$BUN_INSTALL_DIR/bin/bun" ]; then
-    ln -sf "$BUN_INSTALL_DIR/bin/bun" /usr/local/bin/bun
+if [[ -x "$BUN_INSTALL_DIR/bin/bun" ]]; then
+    if [[ "$BUN_INSTALL_DIR/bin/bun" != "/usr/local/bin/bun" ]]; then
+        ln -sf "$BUN_INSTALL_DIR/bin/bun" /usr/local/bin/bun
+    fi
 else
     echo "Error: Bun binary not found at $BUN_INSTALL_DIR/bin/bun" >&2
     exit 1
@@ -53,9 +55,9 @@ if id -u "$REMOTE_USER" >/dev/null 2>&1; then
     chown -R "$REMOTE_USER:" "$AGENT_DIR"
 fi
 
-if [ -d "$REMOTE_USER_HOME" ]; then
+if [[ -d "$REMOTE_USER_HOME" ]]; then
     target="$REMOTE_USER_HOME/.config/bun"
-    if [ -e "$target" ] && [ ! -L "$target" ]; then
+    if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
         mv "$target" "$AGENT_DIR/config-legacy"
     fi
     parent=$(dirname "$target")
@@ -63,7 +65,7 @@ if [ -d "$REMOTE_USER_HOME" ]; then
     rm -f "$target"
     if id -u "$REMOTE_USER" >/dev/null 2>&1; then
         chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-        su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+        su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
     else
         ln -sfn "$AGENT_DIR" "$target"
     fi

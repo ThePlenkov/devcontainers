@@ -1,0 +1,97 @@
+#!/bin/bash
+set -e
+
+# Kimi Code CLI — Moonshot AI's agentic coding assistant
+# Installs globally via npm.
+
+VERSION="${VERSION:-"latest"}"
+SHARE_CONFIG="${SHARECONFIG:-false}"
+REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
+REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/null | cut -d: -f6)}"
+REMOTE_USER_HOME="${REMOTE_USER_HOME:-/home/vscode}"
+AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/kimi"
+
+echo "Installing Kimi Code CLI (version: ${VERSION})..."
+
+# Ensure npm is available (Kimi only uses npm, not curl)
+if ! command -v npm &> /dev/null; then
+    echo "Error: npm is required to install Kimi Code CLI. Add the node feature before this one." >&2
+    exit 1
+fi
+
+# Install Kimi Code CLI globally via npm
+if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
+    npm install -g --ignore-scripts @moonshot-ai/kimi-code
+else
+    npm install -g --ignore-scripts @moonshot-ai/kimi-code@"${VERSION}"
+fi
+npm rebuild -g @moonshot-ai/kimi-code 2>&1 || { echo "Error: kimi native binary setup failed" >&2; exit 1; }
+
+# Locate the installed binary from npm's global bin directory (not PATH)
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+KIMI_BIN="$NPM_GLOBAL_BIN/kimi"
+
+if [[ ! -x "$KIMI_BIN" ]]; then
+    echo "Kimi Code CLI installation failed: binary not found at $KIMI_BIN" >&2
+    exit 1
+fi
+
+if [[ -n "$KIMI_BIN" && "$KIMI_BIN" != "/usr/local/bin/kimi" ]]; then
+    ln -sf "$KIMI_BIN" /usr/local/bin/kimi
+fi
+echo "Kimi Code CLI linked to /usr/local/bin/kimi"
+
+# Share config via AGENT_CONFIG_DIR when shareConfig is enabled
+if [[ "$SHARE_CONFIG" == "true" ]]; then
+    echo "shareConfig: linking ~/.kimi-code to $AGENT_DIR"
+    mkdir -p "$AGENT_DIR"
+    if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+        chown -R "$REMOTE_USER:" "$AGENT_DIR"
+    fi
+
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
+        for target in "$REMOTE_USER_HOME/.kimi-code"; do
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
+                mv "$target" "$AGENT_DIR/config-legacy"
+            fi
+            parent=$(dirname "$target")
+            mkdir -p "$parent"
+            rm -f "$target"
+            if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+                chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
+            else
+                ln -sfn "$AGENT_DIR" "$target"
+            fi
+        done
+    fi
+    echo "Kimi Code configured to use shared config at $AGENT_DIR"
+fi
+
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.kimi-code" "$REMOTE_USER_HOME/.kimi"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
+        fi
+    done
+fi
+
+# Verify installation
+set +e
+if command -v kimi >/dev/null 2>&1; then
+    OUT=$(kimi --version 2>&1)
+    RC=$?
+    if [[ $RC -eq 0 ]]; then
+        echo "Kimi Code CLI version: ${OUT}"
+    else
+        echo "Kimi Code CLI: version check skipped (exit ${RC})"
+    fi
+else
+    echo "Kimi Code CLI: binary not on PATH; skipping version check"
+fi
+set -e
+
+echo "Kimi Code CLI installed successfully!"

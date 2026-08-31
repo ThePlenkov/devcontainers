@@ -1,0 +1,26 @@
+{
+  "id": "docker-agent",
+  "version": "1.0.0",
+  "name": "Docker Agent",
+  "description": "Install Docker Agent — Docker's AI agent CLI plugin for running multi-agent teams from declarative YAML/HCL with TUI, headless CLI, HTTP API, and MCP.",
+  "documentationURL": "https://github.com/docker/docker-agent",
+  "keywords": ["ai","docker","agent","cli","orchestrator","multi-agent"],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version to install"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils","ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

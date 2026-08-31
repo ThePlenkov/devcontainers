@@ -1,6 +1,6 @@
 {
   "id": "herdr",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "name": "Herdr",
   "description": "Install Herdr - AI agent herd orchestration for coordinating multiple coding agents.",
   "keywords": [
@@ -15,6 +15,11 @@
       "type": "string",
       "default": "latest",
       "description": "Version of Herdr to install"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent's config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
     }
   },
   "dependsOn": {

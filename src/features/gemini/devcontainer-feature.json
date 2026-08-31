@@ -1,0 +1,36 @@
+{
+  "id": "gemini",
+  "version": "1.0.0",
+  "name": "Gemini CLI",
+  "description": "Install Google's Gemini CLI — the official terminal AI agent from Google for coding, exploration, and automation with Gemini models.",
+  "documentationURL": "https://github.com/google-gemini/gemini-cli",
+  "keywords": [
+    "ai",
+    "gemini",
+    "google",
+    "agent",
+    "cli",
+    "coding"
+  ],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version of Gemini CLI to install (npm package version or 'latest')"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink ~/.gemini to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {},
+    "ghcr.io/devcontainers/features/node": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

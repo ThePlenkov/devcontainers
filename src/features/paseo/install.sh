@@ -13,10 +13,11 @@ fi
 
 # Install Paseo CLI globally
 if [[ "$VERSION" == "latest" ]]; then
-    npm install -g @getpaseo/cli
+    npm install -g --ignore-scripts @getpaseo/cli
 else
-    npm install -g @getpaseo/cli@"$VERSION"
+    npm install -g --ignore-scripts @getpaseo/cli@"$VERSION"
 fi
+npm rebuild -g @getpaseo/cli 2>&1 || { echo "Error: paseo native binary setup failed" >&2; exit 1; }
 
 # Verify installation
 if command -v paseo &> /dev/null; then

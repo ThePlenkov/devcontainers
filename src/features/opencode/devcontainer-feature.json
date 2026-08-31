@@ -1,10 +1,16 @@
 {
   "id": "opencode",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "name": "OpenCode AI",
   "description": "Install OpenCode AI - open-source AI coding agent for terminal development.",
   "documentationURL": "https://opencode.ai",
-  "keywords": ["ai", "opencode", "agents", "cli", "open-source"],
+  "keywords": [
+    "ai",
+    "opencode",
+    "agents",
+    "cli",
+    "open-source"
+  ],
   "options": {
     "version": {
       "type": "string",
@@ -13,9 +19,17 @@
     },
     "installMethod": {
       "type": "string",
-      "enum": ["npm", "script"],
+      "enum": [
+        "npm",
+        "script"
+      ],
       "default": "npm",
       "description": "Install via npm or the official install script"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent's config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
     }
   },
   "dependsOn": {

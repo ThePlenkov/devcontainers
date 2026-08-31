@@ -1,0 +1,36 @@
+{
+  "id": "qwen-code",
+  "version": "1.0.0",
+  "name": "Qwen Code",
+  "description": "Install Qwen Code from Alibaba — an open-source AI coding agent that lives in your terminal.",
+  "documentationURL": "https://github.com/QwenLM/qwen-code",
+  "keywords": [
+    "ai",
+    "qwen",
+    "alibaba",
+    "agent",
+    "cli",
+    "coding"
+  ],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version to install"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink the agent config dir to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {},
+    "ghcr.io/devcontainers/features/node": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

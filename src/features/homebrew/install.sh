@@ -41,12 +41,12 @@ export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 
 # Fix: brew wrapper script uses readlink which may not be in PATH
 # when invoked via su. Create a symlink in the brew bin directory.
-if [ -x /usr/bin/readlink ] && [ ! -e "$HOMEBREW_PREFIX/bin/readlink" ]; then
+if [[ -x /usr/bin/readlink ]] && [[ ! -e "$HOMEBREW_PREFIX/bin/readlink" ]]; then
     ln -sf /usr/bin/readlink "$HOMEBREW_PREFIX/bin/readlink"
 fi
 
 # Install requested packages
-if [ -n "$PACKAGES" ]; then
+if [[ -n "$PACKAGES" ]]; then
     # Parse packages: try JSON array first, then comma-separated string
     if echo "$PACKAGES" | jq -r '.[]' 2>/dev/null | grep -q .; then
         PACKAGE_LIST=$(echo "$PACKAGES" | jq -r '.[]')
@@ -55,7 +55,7 @@ if [ -n "$PACKAGES" ]; then
     fi
 
     for pkg in $PACKAGE_LIST; do
-        [ -z "$pkg" ] && continue
+        [[ -z "$pkg" ]] && continue
         echo "Installing Homebrew package: $pkg"
         su -s /bin/bash - "$REMOTE_USER" -c \
             "export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOMEBREW_PREFIX/bin:\$PATH'; brew install '$pkg' || brew upgrade '$pkg'"
@@ -63,9 +63,9 @@ if [ -n "$PACKAGES" ]; then
         # Symlink formula binaries to /usr/local/bin for global access
         prefix=$(su -s /bin/bash - "$REMOTE_USER" -c \
             "export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOMEBREW_PREFIX/bin:\$PATH'; brew --prefix '$pkg' 2>/dev/null" || true)
-        if [ -n "$prefix" ] && [ -d "$prefix/bin" ]; then
+        if [[ -n "$prefix" ]] && [[ -d "$prefix/bin" ]]; then
             for bin_file in "$prefix/bin"/*; do
-                if [ -x "$bin_file" ]; then
+                if [[ -x "$bin_file" ]]; then
                     ln -sf "$bin_file" "/usr/local/bin/$(basename "$bin_file")"
                 fi
             done

@@ -6,45 +6,66 @@ set -e
 VERSION="${VERSION:-"latest"}"
 REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
 REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/null | cut -d: -f6)}"
-REMOTE_USER_HOME="${REMOTE_USER_HOME:-$(eval echo ~$REMOTE_USER)}"
+REMOTE_USER_HOME="${REMOTE_USER_HOME:-/home/vscode}"
 AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/bob"
+SHARE_CONFIG="${SHARECONFIG:-false}"
 
 echo "Installing Bob Shell ${VERSION}..."
 
 if [[ "$VERSION" = "latest" ]]; then
-    npm install -g @roo-code/bob-shell
+    npm install -g --ignore-scripts @roo-code/bob-shell
 else
-    npm install -g @roo-code/bob-shell@"$VERSION"
+    npm install -g --ignore-scripts @roo-code/bob-shell@"$VERSION"
+fi
+npm rebuild -g @roo-code/bob-shell 2>&1 || { echo "Error: bob native binary setup failed" >&2; exit 1; }
+
+NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+if [[ -x "$NPM_GLOBAL_BIN/bob" ]]; then
+    echo "Bob Shell installed successfully!"
+    "$NPM_GLOBAL_BIN/bob" --version || true
+else
+    echo "Error: Bob Shell installation failed: 'bob' command not found at $NPM_GLOBAL_BIN/bob" >&2
+    exit 1
 fi
 
-if command -v bob &> /dev/null; then
-    echo "Bob Shell installed successfully!"
-    bob --version || true
-else
-    echo "Warning: Bob Shell installation completed but 'bob' command not found in PATH" >&2
+if [[ -n "$NPM_GLOBAL_BIN" && -x "$NPM_GLOBAL_BIN/bob" && "$NPM_GLOBAL_BIN/bob" != "/usr/local/bin/bob" ]]; then
+    ln -sf "$NPM_GLOBAL_BIN/bob" /usr/local/bin/bob
 fi
 
 # Shared agent config for Bob
-mkdir -p "$AGENT_DIR"
-if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-    chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
+if [[ "$SHARE_CONFIG" == "true" ]]; then
+    mkdir -p "$AGENT_DIR"
+    if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+        chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
+    fi
+
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
+        for target in "$REMOTE_USER_HOME/.bob" "$REMOTE_USER_HOME/.config/bob"; do
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
+                mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
+            fi
+            parent=$(dirname "$target")
+            mkdir -p "$parent"
+            rm -f "$target"
+            if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+                chown "$REMOTE_USER:$REMOTE_USER" "$parent" 2>/dev/null || true
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            else
+                ln -sfn "$AGENT_DIR" "$target"
+            fi
+        done
+    fi
+    echo "Bob Shell configured to use $AGENT_DIR"
 fi
 
-if [ -d "$REMOTE_USER_HOME" ]; then
-    for target in "$REMOTE_USER_HOME/.bob" "$REMOTE_USER_HOME/.config/bob"; do
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
-            mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
-        fi
-        parent=$(dirname "$target")
-        mkdir -p "$parent"
-        rm -f "$target"
-        if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-            chown "$REMOTE_USER:$REMOTE_USER" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
-        else
-            ln -sfn "$AGENT_DIR" "$target"
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.bob" "$REMOTE_USER_HOME/.config/bob"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
         fi
     done
 fi
-
-echo "Bob Shell configured to use $AGENT_DIR"

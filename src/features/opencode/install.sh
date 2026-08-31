@@ -8,7 +8,9 @@ INSTALL_METHOD=${INSTALLMETHOD:-"npm"}
 
 REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
 REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/null | cut -d: -f6)}"
+REMOTE_USER_HOME="${REMOTE_USER_HOME:-/home/vscode}"
 AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/opencode"
+SHARE_CONFIG="${SHARECONFIG:-false}"
 
 # Enable pipefail after home resolution (getent may fail under set -eo pipefail)
 set -o pipefail
@@ -27,30 +29,26 @@ case "$INSTALL_METHOD" in
             exit 1
         fi
         if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
-            npm install -g opencode-ai
+            npm install -g --ignore-scripts opencode-ai
         else
-            npm install -g opencode-ai@"${VERSION}"
+            npm install -g --ignore-scripts opencode-ai@"${VERSION}"
         fi
-        # Copy binary to /usr/local/bin for system-wide access
-        OPENCODE_BIN="$(command -v opencode || true)"
-        if [[ -z "$OPENCODE_BIN" ]]; then
-            NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || true)"
-            if [[ ! -d "$NPM_GLOBAL_BIN" ]]; then
-                NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
-            fi
-            OPENCODE_BIN="$NPM_GLOBAL_BIN/opencode"
-            # If the candidate doesn't exist, try $HOME/.local/bin
-            if [[ ! -x "$OPENCODE_BIN" ]]; then
-                OPENCODE_BIN="${REMOTE_USER_HOME:-$HOME}/.local/bin/opencode"
-            fi
+        # Explicitly run postinstall to install native binaries
+        npm rebuild -g opencode-ai 2>&1 || { echo "Error: opencode native binary setup failed" >&2; exit 1; }
+        # Locate the installed binary from npm's global bin directory (not PATH)
+        NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
+        OPENCODE_BIN="$NPM_GLOBAL_BIN/opencode"
+        if [[ ! -x "$OPENCODE_BIN" ]]; then
+            OPENCODE_BIN="${REMOTE_USER_HOME:-$HOME}/.local/bin/opencode"
         fi
         if [[ ! -x "$OPENCODE_BIN" ]]; then
             echo "OpenCode installation failed: binary not found at $OPENCODE_BIN" >&2
             exit 1
         fi
-        cp "$OPENCODE_BIN" /usr/local/bin/opencode
-        chmod +x /usr/local/bin/opencode
-        echo "OpenCode copied to /usr/local/bin/opencode"
+        if [[ -n "$OPENCODE_BIN" && "$OPENCODE_BIN" != "/usr/local/bin/opencode" ]]; then
+            ln -sf "$OPENCODE_BIN" /usr/local/bin/opencode
+        fi
+        echo "OpenCode linked to /usr/local/bin/opencode"
         ;;
 
     script)
@@ -91,24 +89,38 @@ if [[ ! -x /usr/local/bin/opencode ]]; then
 fi
 
 # Shared agent config
-mkdir -p "$AGENT_DIR"
-if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-    chown -R "$REMOTE_USER:" "$AGENT_DIR"
+if [[ "$SHARE_CONFIG" == "true" ]]; then
+    mkdir -p "$AGENT_DIR"
+    if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+        chown -R "$REMOTE_USER:" "$AGENT_DIR"
+    fi
+
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
+        for target in "$REMOTE_USER_HOME/.opencode" "$REMOTE_USER_HOME/.config/opencode"; do
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
+                mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
+            fi
+            parent=$(dirname "$target")
+            mkdir -p "$parent"
+            rm -f "$target"
+            if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+                chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
+            else
+                ln -sfn "$AGENT_DIR" "$target"
+            fi
+        done
+    fi
 fi
 
-if [ -d "$REMOTE_USER_HOME" ]; then
-    for target in "$REMOTE_USER_HOME/.opencode" "$REMOTE_USER_HOME/.config/opencode"; do
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
-            mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
-        fi
-        parent=$(dirname "$target")
-        mkdir -p "$parent"
-        rm -f "$target"
-        if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-            chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
-        else
-            ln -sfn "$AGENT_DIR" "$target"
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]] && [[ -n "$REMOTE_USER_HOME" ]] && [[ -d "$REMOTE_USER_HOME" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.opencode" "$REMOTE_USER_HOME/.config/opencode"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
         fi
     done
 fi

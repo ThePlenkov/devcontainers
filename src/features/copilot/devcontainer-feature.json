@@ -1,0 +1,38 @@
+{
+  "id": "copilot",
+  "version": "1.0.0",
+  "name": "GitHub Copilot CLI",
+  "description": "Install GitHub's standalone Copilot CLI — the terminal AI agent from GitHub for coding, automation, and repository exploration.",
+  "documentationURL": "https://github.com/github/copilot-cli",
+  "keywords": [
+    "ai",
+    "copilot",
+    "github",
+    "agent",
+    "cli",
+    "coding"
+  ],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version of GitHub Copilot CLI to install (npm package version or 'latest')"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink ~/.copilot to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {},
+    "ghcr.io/devcontainers/features/github-cli": {},
+    "ghcr.io/devcontainers/features/node": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/devcontainers/features/github-cli",
+    "ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": "claude-code",
+  "version": "1.0.0",
+  "name": "Claude Code",
+  "description": "Install Anthropic's Claude Code CLI agent — the terminal-native coding agent that edits files, runs commands, and uses tools autonomously.",
+  "documentationURL": "https://docs.anthropic.com/en/docs/claude-code",
+  "keywords": [
+    "ai",
+    "claude",
+    "anthropic",
+    "agent",
+    "cli",
+    "coding"
+  ],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version of Claude Code to install (npm package version or 'latest')"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink ~/.claude to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {},
+    "ghcr.io/devcontainers/features/node": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

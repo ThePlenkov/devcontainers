@@ -3,11 +3,11 @@ set -e
 
 # Anthropic Claude Configuration Script
 
-API_KEY=${APIKEY:-""}
 REMOTE_USER="${_REMOTE_USER:-${_CONTAINER_USER:-root}}"
 REMOTE_USER_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" 2>/dev/null | cut -d: -f6)}"
-REMOTE_USER_HOME="${REMOTE_USER_HOME:-$(eval echo ~$REMOTE_USER)}"
+REMOTE_USER_HOME="${REMOTE_USER_HOME:-/home/vscode}"
 AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/claude"
+SHARE_CONFIG="${SHARECONFIG:-false}"
 
 echo "Configuring Anthropic Claude..."
 
@@ -16,35 +16,43 @@ if command -v python3 &> /dev/null; then
     pip3 install anthropic || echo "Failed to install anthropic package"
 fi
 
-# Set up environment variable if API key is provided
-if [ -n "$API_KEY" ]; then
-    echo "export ANTHROPIC_API_KEY=$API_KEY" >> /etc/environment
-    echo "ANTHROPIC_API_KEY set in /etc/environment"
-else
-    echo "No API key provided. Set ANTHROPIC_API_KEY manually."
-fi
-
 # Shared agent config for Claude
-mkdir -p "$AGENT_DIR"
-if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-    chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
+if [[ "$SHARE_CONFIG" == "true" ]]; then
+    mkdir -p "$AGENT_DIR"
+    if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+        chown -R "$REMOTE_USER:$REMOTE_USER" "$AGENT_DIR"
+    fi
+
+    if [[ -d "$REMOTE_USER_HOME" ]]; then
+        for target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
+                mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
+            fi
+            parent=$(dirname "$target")
+            mkdir -p "$parent"
+            rm -f "$target"
+            if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+                chown "$REMOTE_USER:$REMOTE_USER" "$parent" 2>/dev/null || true
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
+            else
+                ln -sfn "$AGENT_DIR" "$target"
+            fi
+        done
+    fi
 fi
 
-if [ -d "$REMOTE_USER_HOME" ]; then
-    for target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
-            mv "$target" "$AGENT_DIR/$(basename "$target")-legacy"
-        fi
-        parent=$(dirname "$target")
-        mkdir -p "$parent"
-        rm -f "$target"
-        if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-            chown "$REMOTE_USER:$REMOTE_USER" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
-        else
-            ln -sfn "$AGENT_DIR" "$target"
-        fi
-    done
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    if [[ -n "$REMOTE_USER_HOME" ]] && [[ -d "$REMOTE_USER_HOME" ]]; then
+        for old_target in "$REMOTE_USER_HOME/.claude" "$REMOTE_USER_HOME/.config/claude"; do
+            if [[ -L "$old_target" ]]; then
+                link_dest=$(readlink "$old_target" 2>/dev/null || true)
+                if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                    rm -f "$old_target"
+                fi
+            fi
+        done
+    fi
 fi
 
 # Usage examples

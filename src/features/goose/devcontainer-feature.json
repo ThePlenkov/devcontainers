@@ -1,0 +1,35 @@
+{
+  "id": "goose",
+  "version": "1.0.0",
+  "name": "Goose CLI",
+  "description": "Install Goose CLI from Block — an open-source, extensible AI agent that goes beyond code suggestions to install, execute, edit, and test code with any LLM.",
+  "documentationURL": "https://github.com/aaif-goose/goose",
+  "keywords": [
+    "ai",
+    "goose",
+    "block",
+    "agent",
+    "cli",
+    "coding",
+    "open-source"
+  ],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version of Goose CLI to install ('latest' or a release tag like 'v1.48.0')"
+    },
+    "shareConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, symlink ~/.config/goose to the shared AGENT_CONFIG_DIR so config persists across container rebuilds and is shared with other agents"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/docker-x/devcontainers/agent-config": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/docker-x/devcontainers/agent-config"
+  ]
+}

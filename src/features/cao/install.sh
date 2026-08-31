@@ -17,22 +17,17 @@ echo "Installing CAO — CLI Agent Orchestrator (version: ${VERSION})..."
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-# Install git explicitly (CAO uses git+https source which requires git)
-if ! command -v git &> /dev/null; then
-    apt-get update -y && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-fi
-
-# Install curl if not present
-if ! command -v curl &> /dev/null; then
-    apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-fi
-
-# Install tmux if not present (required by CAO for session orchestration)
-if ! command -v tmux &> /dev/null; then
-    apt-get update -y && apt-get install -y tmux && rm -rf /var/lib/apt/lists/*
+# Install git, curl, and tmux if not present (consolidated apt-get calls)
+MISSING_PKGS=()
+command -v git >/dev/null 2>&1 || MISSING_PKGS+=(git)
+command -v curl >/dev/null 2>&1 || MISSING_PKGS+=(curl)
+command -v tmux >/dev/null 2>&1 || MISSING_PKGS+=(tmux)
+if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
+    apt-get update && apt-get install -y --no-install-recommends "${MISSING_PKGS[@]}"
+    rm -rf /var/lib/apt/lists/*
 fi
 # CAO requires tmux 3.3+; warn if the installed version is too old
-TMUX_VERSION=$(tmux -V 2>/dev/null | awk '{print $2}' | grep -oE '^[0-9]+\.[0-9]+')
+TMUX_VERSION="$(tmux -V 2>/dev/null | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || true)"
 if [[ -n "$TMUX_VERSION" ]] && [[ "$(echo "$TMUX_VERSION" | cut -d. -f1)" -lt 3 || ( "$(echo "$TMUX_VERSION" | cut -d. -f1)" -eq 3 && "$(echo "$TMUX_VERSION" | cut -d. -f2)" -lt 3 ) ]]; then
     echo "Warning: CAO requires tmux 3.3+, found $TMUX_VERSION. Some features may not work." >&2
 fi
@@ -114,18 +109,10 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
 fi
 
 # Verify installation
-set +e
-if command -v cao >/dev/null 2>&1; then
-    OUT=$(cao --version 2>&1)
-    RC=$?
-    if [[ $RC -eq 0 ]]; then
-        echo "CAO version: ${OUT}"
-    else
-        echo "CAO: version check skipped (exit ${RC})"
-    fi
-else
-    echo "CAO: binary not on PATH; skipping version check"
+if ! cao --version >/dev/null 2>&1; then
+    echo "Error: CAO installation verification failed" >&2
+    exit 1
 fi
-set -e
+echo "CAO version: $(cao --version 2>&1)"
 
 echo "CAO installed successfully!"

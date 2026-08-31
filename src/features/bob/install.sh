@@ -24,7 +24,8 @@ if [[ -x "$NPM_GLOBAL_BIN/bob" ]]; then
     echo "Bob Shell installed successfully!"
     "$NPM_GLOBAL_BIN/bob" --version || true
 else
-    echo "Warning: Bob Shell installation completed but 'bob' command not found at $NPM_GLOBAL_BIN/bob" >&2
+    echo "Error: Bob Shell installation failed: 'bob' command not found at $NPM_GLOBAL_BIN/bob" >&2
+    exit 1
 fi
 
 if [[ -n "$NPM_GLOBAL_BIN" && -x "$NPM_GLOBAL_BIN/bob" && "$NPM_GLOBAL_BIN/bob" != "/usr/local/bin/bob" ]]; then
@@ -48,7 +49,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             rm -f "$target"
             if id -u "$REMOTE_USER" >/dev/null 2>&1; then
                 chown "$REMOTE_USER:$REMOTE_USER" "$parent" 2>/dev/null || true
-                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'" 2>/dev/null || true
             else
                 ln -sfn "$AGENT_DIR" "$target"
             fi

@@ -108,6 +108,7 @@ install_gascity() {
     local tmpdir; tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' RETURN
     curl --proto =https --proto-redir =https -fsSL "$url" -o "$tmpdir/$asset"
+    echo "Warning: No checksums published by upstream. Skipping SHA-256 verification." >&2
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
     if [[ ! -f "$tmpdir/gc" ]]; then
@@ -134,6 +135,7 @@ install_dolt() {
     local tmpdir; tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' RETURN
     curl --proto =https --proto-redir =https -fsSL "$url" -o "$tmpdir/$asset"
+    echo "Warning: No checksums published by upstream. Skipping SHA-256 verification." >&2
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
     # Dolt tarball layout: either ./bin/dolt or ./dolt
@@ -169,6 +171,7 @@ install_beads() {
     local tmpdir; tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' RETURN
     curl --proto =https --proto-redir =https -fsSL "$url" -o "$tmpdir/$asset"
+    echo "Warning: No checksums published by upstream. Skipping SHA-256 verification." >&2
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
     # beads tarball layout: either ./bd or ./bin/bd

@@ -67,6 +67,18 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
     echo "Copilot CLI configured to use shared config at $AGENT_DIR"
 fi
 
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.copilot" "$REMOTE_USER_HOME/.config/copilot"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
+        fi
+    done
+fi
+
 # Verify installation
 set +e
 if command -v copilot >/dev/null 2>&1; then

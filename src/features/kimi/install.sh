@@ -13,11 +13,7 @@ AGENT_DIR="${AGENT_CONFIG_DIR:-/usr/local/share/agent-config}/kimi"
 
 echo "Installing Kimi Code CLI (version: ${VERSION})..."
 
-# Install curl and npm if not available
-if ! command -v curl &> /dev/null; then
-    apt-get update -y && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-fi
-
+# Ensure npm is available (Kimi only uses npm, not curl)
 if ! command -v npm &> /dev/null; then
     echo "Error: npm is required to install Kimi Code CLI. Add the node feature before this one." >&2
     exit 1

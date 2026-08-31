@@ -48,7 +48,11 @@ if [[ "$VERSION" == "latest" || -z "$VERSION" ]]; then
         exit 1
     fi
 else
-    RELEASE_TAG="$VERSION"
+    if [[ "$VERSION" != "latest" && -n "$VERSION" && "$VERSION" != v* ]]; then
+        RELEASE_TAG="v${VERSION}"
+    else
+        RELEASE_TAG="$VERSION"
+    fi
 fi
 
 echo "Goose release: $RELEASE_TAG"
@@ -126,6 +130,18 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         fi
     fi
     echo "Goose configured to use shared config at $AGENT_DIR"
+fi
+
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.config/goose" "$REMOTE_USER_HOME/.goose"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
+        fi
+    done
 fi
 
 # Verify installation

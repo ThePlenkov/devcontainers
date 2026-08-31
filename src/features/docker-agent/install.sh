@@ -60,7 +60,7 @@ else
 fi
 if curl --proto =https --proto-redir =https -fsSL "$CHECKSUM_URL" -o "$TMP_DIR/checksums.txt" 2>/dev/null \
     && [[ -s "$TMP_DIR/checksums.txt" ]]; then
-    expected=$(grep "docker-agent-linux-${DOCKER_AGENT_ARCH}" "$TMP_DIR/checksums.txt" | awk '{print $1}')
+    expected=$(grep -E "^[a-f0-9]+[[:space:]]+docker-agent-linux-${DOCKER_AGENT_ARCH}$" "$TMP_DIR/checksums.txt" | awk '{print $1}')
     if [[ -n "$expected" ]]; then
         actual=$(sha256sum "$TMP_DIR/docker-agent" | awk '{print $1}')
         if [[ "$actual" != "$expected" ]]; then

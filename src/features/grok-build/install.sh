@@ -40,7 +40,7 @@ fi
 GROK_BIN="$(command -v grok || true)"
 if [[ -z "$GROK_BIN" ]]; then
     # The upstream installer places grok in $HOME/.grok/bin; also check common locations
-    GROK_BIN="$(find "$HOME/.grok/bin" /usr/local/bin -name "grok" -type f -executable 2>/dev/null | head -1)"
+    GROK_BIN="$(find "$HOME/.grok/bin" /usr/local/bin -name "grok" -executable 2>/dev/null | head -1)"
 fi
 if [[ -z "$GROK_BIN" ]]; then
     # Installer may place the binary in ~/.local/bin; check common locations
@@ -63,8 +63,8 @@ fi
 echo "Grok Build CLI linked to /usr/local/bin/grok"
 
 # Profile.d for login shells
-cat > /etc/profile.d/grok-build.sh << 'EOF'
-export GROK_HOME="${GROK_HOME:-$HOME/.grok}"
+cat > /etc/profile.d/grok-build.sh << EOF
+export GROK_HOME="\${GROK_HOME:-$REMOTE_USER_HOME/.grok}"
 EOF
 chmod 0755 /etc/profile.d/grok-build.sh
 

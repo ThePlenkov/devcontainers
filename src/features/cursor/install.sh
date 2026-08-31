@@ -33,6 +33,12 @@ for bin in agent cursor-agent; do
     fi
 done
 
+# Link the cursor binary itself, guarding against self-link
+CURSOR_BIN="$REMOTE_USER_HOME/.local/bin/cursor"
+if [[ -n "$CURSOR_BIN" && "$CURSOR_BIN" != "/usr/local/bin/cursor" ]]; then
+    ln -sf "$CURSOR_BIN" /usr/local/bin/cursor
+fi
+
 # Shared agent config for Cursor
 if [[ "$SHARE_CONFIG" == "true" ]]; then
     mkdir -p "$AGENT_DIR"

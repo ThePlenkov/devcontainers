@@ -115,6 +115,9 @@ fi
 NPM_GLOBAL_BIN="$(npm config get prefix 2>/dev/null || true)/bin"
 HERDR_BIN="$NPM_GLOBAL_BIN/herdr"
 if [[ ! -x "$HERDR_BIN" ]]; then
+    HERDR_BIN="$(command -v herdr || true)"
+fi
+if [[ -z "$HERDR_BIN" ]] || [[ ! -x "$HERDR_BIN" ]]; then
     HERDR_BIN="${REMOTE_USER_HOME:-$HOME}/.local/bin/herdr"
 fi
 

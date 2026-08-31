@@ -113,7 +113,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
 fi
 
 # Clean up old symlinks from previous always-on shareConfig behavior
-if [[ "$SHARE_CONFIG" != "true" ]]; then
+if [[ "$SHARE_CONFIG" != "true" ]] && [[ -n "$REMOTE_USER_HOME" ]] && [[ -d "$REMOTE_USER_HOME" ]]; then
     for old_target in "$REMOTE_USER_HOME/.opencode" "$REMOTE_USER_HOME/.config/opencode"; do
         if [[ -L "$old_target" ]]; then
             link_dest=$(readlink "$old_target" 2>/dev/null || true)

@@ -50,7 +50,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
     fi
 
     if [[ -d "$REMOTE_USER_HOME" ]]; then
-        for target in "$REMOTE_USER_HOME/.kimi" "$REMOTE_USER_HOME/.kimi-code"; do
+        for target in "$REMOTE_USER_HOME/.kimi-code"; do
             if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
                 mv "$target" "$AGENT_DIR/config-legacy"
             fi
@@ -66,6 +66,17 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
         done
     fi
     echo "Kimi Code configured to use shared config at $AGENT_DIR"
+fi
+
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.kimi-code" "$REMOTE_USER_HOME/.kimi"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
+        fi
+    done
 fi
 
 # Verify installation

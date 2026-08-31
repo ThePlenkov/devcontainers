@@ -62,7 +62,9 @@ EOF
 else
     # shareConfig is false — remove any pre-existing profile.d script
     # so CURSOR_CONFIG_DIR is not set unconditionally.
-    rm -f /etc/profile.d/cursor.sh
+    if [[ -f /etc/profile.d/cursor.sh ]] && grep -q "cursor.*AGENT_CONFIG_DIR\|cursor.*AGENT_DIR\|Cursor.*feature" /etc/profile.d/cursor.sh 2>/dev/null; then
+        rm -f /etc/profile.d/cursor.sh
+    fi
 
     # Remove legacy ~/.cursor symlink if it points to this feature's AGENT_DIR
     if [[ -L "$REMOTE_USER_HOME/.cursor" ]]; then

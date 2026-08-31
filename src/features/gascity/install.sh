@@ -124,7 +124,8 @@ install_gascity() {
             exit 1
         fi
     else
-        echo "Warning: Could not download checksums.txt. Skipping SHA-256 verification." >&2
+        echo "Error: Could not download checksums.txt. Failing per REVIEW.md Rule 12." >&2
+        exit 1
     fi
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
@@ -152,7 +153,7 @@ install_dolt() {
     local tmpdir; tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' RETURN
     curl --proto =https --proto-redir =https -fsSL "$url" -o "$tmpdir/$asset"
-    echo "Warning: No checksums published by upstream. Skipping SHA-256 verification." >&2
+    echo "Warning: Dolt does not publish checksums.txt. Skipping SHA-256 verification." >&2
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
     # Dolt tarball layout: either ./bin/dolt or ./dolt
@@ -204,7 +205,8 @@ install_beads() {
             exit 1
         fi
     else
-        echo "Warning: Could not download checksums.txt. Skipping SHA-256 verification." >&2
+        echo "Error: Could not download checksums.txt. Failing per REVIEW.md Rule 12." >&2
+        exit 1
     fi
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 

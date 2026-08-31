@@ -15,10 +15,7 @@ set -e
 #   3. Optionally installs PUBLIC skills to /usr/local/share/agent-skills (system-wide,
 #      outside PVC) as a fallback for environments without gh auth
 
-INSTALLER="${INSTALLER:-gh}"
 AGENTS="${AGENTS:-*}"
-COPY="${COPY:-true}"
-TOKEN_OPTION="${TOKEN:-}"
 
 # SKILLS is a comma-separated string
 SKILLS_STR="${SKILLS:-}"
@@ -31,33 +28,14 @@ HOME_DIR="${HOME_DIR:-/home/${REMOTE_USER}}"
 # System-wide fallback store (for public skills, outside PVC)
 SKILLS_STORE="/usr/local/share/agent-skills"
 
-echo "agent-skills: installer=${INSTALLER}"
 echo "agent-skills: skills=${SKILLS[*]}"
 echo "agent-skills: agents=${AGENTS}"
 
 # ---------------------------------------------------------------------------
-# Auth setup (for build-time public skill installs only)
-# ---------------------------------------------------------------------------
-
-RESOLVED_TOKEN=""
-if [[ -n "${TOKEN_OPTION}" ]]; then
-  RESOLVED_TOKEN="${TOKEN_OPTION}"
-elif [[ -n "${GH_TOKEN}" ]]; then
-  RESOLVED_TOKEN="${GH_TOKEN}"
-elif [[ -n "${GITHUB_TOKEN}" ]]; then
-  RESOLVED_TOKEN="${GITHUB_TOKEN}"
-fi
-
-if [[ -n "${RESOLVED_TOKEN}" ]]; then
-  echo "agent-skills: token found, configuring gh auth for build-time installs"
-  echo "${RESOLVED_TOKEN}" | gh auth login --with-token 2>/dev/null || true
-  export GH_TOKEN="${RESOLVED_TOKEN}"
-else
-  echo "agent-skills: no token — will try public repos only at build time"
-fi
-
-# ---------------------------------------------------------------------------
 # Build-time: install PUBLIC skills to system-wide store (fallback)
+# No token handling — public repos don't need auth. If GH_TOKEN is set in
+# the environment, gh picks it up automatically (no gh auth login needed,
+# which would bake credentials into the image).
 # ---------------------------------------------------------------------------
 
 run_as_user() {
@@ -70,7 +48,7 @@ run_as_user() {
     done
     local escaped_home
     escaped_home=$(printf '%q' "${HOME_DIR}")
-    su -s /bin/bash "$REMOTE_USER" -c "export HOME=${escaped_home}; export GH_TOKEN=${RESOLVED_TOKEN:+$(printf '%q' "$RESOLVED_TOKEN")}; exec ${cmd_args[*]}"
+    su -s /bin/bash "$REMOTE_USER" -c "export HOME=${escaped_home}; exec ${cmd_args[*]}"
   fi
 }
 
@@ -90,6 +68,10 @@ fi
 
 SKILL_COUNT=$(find "${SKILLS_STORE}" -maxdepth 2 -name "SKILL.md" 2>/dev/null | wc -l)
 echo "agent-skills: ${SKILL_COUNT} public skills in system store"
+
+# Clean up any gh auth state that might have been set by env — don't bake tokens
+rm -f /root/.config/gh/hosts.yml 2>/dev/null || true
+rm -f "${HOME_DIR}/.config/gh/hosts.yml" 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
 # Known agents → skills directory mapping
@@ -150,23 +132,31 @@ cat > /usr/local/bin/agent-skills-sync << SYNC_EOF
 #   1. Install skills from GitHub repos using existing gh auth (on PVC)
 #   2. Create per-agent symlinks so each agent finds skills in its expected dir
 #
-# Idempotent: skips install if skills already present, only creates missing symlinks.
+# Idempotent: creates .skill-lock.json after install attempt, skips if lock exists.
+# Fallback (no gh auth): links to system store but does NOT create lock file,
+# so later runs with auth can still install real skills.
 
 AGENT_SKILLS_STORE="/usr/local/share/agent-skills"
 SKILLS_REPOS="${SKILLS_STRING# }"
+HOME_FALLBACK="${HOME_DIR}"
 
 # Fix HOME for OpenShift restricted SCC (sets HOME=/)
-_H="\${HOME:-/home/vscode}"
-[ "\$_H" = "/" ] && _H="/home/vscode"
+_H="\${HOME:-\$HOME_FALLBACK}"
+[ "\$_H" = "/" ] && _H="\$HOME_FALLBACK"
 export HOME="\$_H"
 
 AGENTS_DIR="\$_H/.agents"
 SKILLS_DIR="\$AGENTS_DIR/skills"
+LOCK_FILE="\$AGENTS_DIR/.skill-lock.json"
 
-# --- 1. Install skills if not already present ---
-# Use ~/.agents/.skill-lock.json as marker — if it exists, skills were installed
-if [ ! -f "\$AGENTS_DIR/.skill-lock.json" ] && [ ! -d "\$SKILLS_DIR" ]; then
-  # Check if gh is authenticated
+# Helper: check if a directory contains actual SKILL.md files
+_has_skills() {
+  [ -d "\$1" ] && [ -n "\$(find "\$1" -maxdepth 2 -name 'SKILL.md' 2>/dev/null | head -1)" ]
+}
+
+# --- 1. Install skills if not already done ---
+# Skip only if lock file exists (means install was attempted, success or fail)
+if [ ! -f "\$LOCK_FILE" ]; then
   if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
     echo "agent-skills: installing skills via gh (first run)..."
     mkdir -p "\$AGENTS_DIR"
@@ -174,36 +164,32 @@ if [ ! -f "\$AGENTS_DIR/.skill-lock.json" ] && [ ! -d "\$SKILLS_DIR" ]; then
       gh skill install "\$repo" --scope user --all --force 2>/dev/null || \\
         echo "agent-skills: failed to install \$repo (skipping)"
     done
-  else
-    # No gh auth — fall back to system-wide store if it has skills
-    if [ -d "\$AGENT_SKILLS_STORE" ] && [ "\$(find "\$AGENT_SKILLS_STORE" -name 'SKILL.md' 2>/dev/null | head -1)" ]; then
-      echo "agent-skills: no gh auth, using system-wide fallback store"
-      mkdir -p "\$AGENTS_DIR"
-      ln -sfn "\$AGENT_SKILLS_STORE" "\$SKILLS_DIR"
-    fi
+    # Mark as done — don't retry every login even if some repos failed
+    touch "\$LOCK_FILE"
   fi
 fi
 
-# --- 2. Create per-agent symlinks ---
+# --- 2. Ensure ~/.agents/skills exists ---
+# If no PVC skills dir, link to system store (but only if it has real skills)
+if [ ! -e "\$SKILLS_DIR" ] && _has_skills "\$AGENT_SKILLS_STORE"; then
+  mkdir -p "\$AGENTS_DIR" 2>/dev/null
+  ln -sfn "\$AGENT_SKILLS_STORE" "\$SKILLS_DIR"
+fi
+
+# --- 3. Create per-agent symlinks ---
 _agent_skills_link() {
   _target="\$_H/\$1"
   _parent="\$(dirname "\$_target")"
   if [ ! -e "\$_target" ]; then
     mkdir -p "\$_parent" 2>/dev/null
-    # Link to ~/.agents/skills if it exists, else to system store
-    if [ -d "\$SKILLS_DIR" ]; then
+    # Link to ~/.agents/skills if it has skills, else to system store
+    if _has_skills "\$SKILLS_DIR"; then
       ln -sfn "\$SKILLS_DIR" "\$_target"
-    elif [ -d "\$AGENT_SKILLS_STORE" ]; then
+    elif _has_skills "\$AGENT_SKILLS_STORE"; then
       ln -sfn "\$AGENT_SKILLS_STORE" "\$_target"
     fi
   fi
 }
-
-# Always ensure ~/.agents/skills exists (symlink to system store if no PVC skills)
-if [ ! -e "\$SKILLS_DIR" ] && [ -d "\$AGENT_SKILLS_STORE" ]; then
-  mkdir -p "\$AGENTS_DIR" 2>/dev/null
-  ln -sfn "\$AGENT_SKILLS_STORE" "\$SKILLS_DIR"
-fi
 
 ${AGENT_LINK_CALLS}
 SYNC_EOF

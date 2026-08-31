@@ -14,11 +14,6 @@
     "mcp"
   ],
   "options": {
-    "installer": {
-      "type": "string",
-      "default": "gh",
-      "description": "Skill installer: 'gh' (gh skill, default), 'npx' (skills CLI), or 'auto' (gh first)"
-    },
     "skills": {
       "type": "string",
       "default": "",
@@ -28,16 +23,6 @@
       "type": "string",
       "default": "*",
       "description": "Comma-separated agent names to create symlinks for (e.g. 'devin,claude-code,codex'). Default '*' = all known agents"
-    },
-    "token": {
-      "type": "string",
-      "default": "",
-      "description": "GitHub token for private repo access. Falls back to $GH_TOKEN / $GITHUB_TOKEN env vars."
-    },
-    "copy": {
-      "type": "boolean",
-      "default": true,
-      "description": "Copy skill files instead of symlinking (used by npx installer only)"
     }
   },
   "dependsOn": {

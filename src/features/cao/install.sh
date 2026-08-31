@@ -47,7 +47,7 @@ if ! command -v uv &> /dev/null; then
     curl --proto =https --proto-redir =https -LsSf https://astral.sh/uv/install.sh -o "$UV_TMP_SCRIPT"
     sh "$UV_TMP_SCRIPT"
     # Add uv to PATH (installer with UV_INSTALL_DIR=/usr/local places uv in /usr/local/bin)
-    export PATH="/usr/local:/usr/local/bin:$PATH"
+    export PATH="/usr/local/bin:$PATH"
 fi
 
 # Determine the install ref (branch/tag)

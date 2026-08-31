@@ -46,6 +46,18 @@ if [[ -n "$AMP_BIN" && "$AMP_BIN" != "/usr/local/bin/amp" ]]; then
 fi
 echo "Amp CLI linked to /usr/local/bin/amp"
 
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.amp" "$REMOTE_USER_HOME/.config/amp"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
+        fi
+    done
+fi
+
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then
     echo "shareConfig: linking ~/.amp to $AGENT_DIR"

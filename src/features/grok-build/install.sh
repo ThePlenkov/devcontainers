@@ -36,6 +36,16 @@ if id -u "$REMOTE_USER" >/dev/null 2>&1 && [[ "$REMOTE_USER" != "root" ]]; then
     chown -R "$REMOTE_USER:" "$HOME/.grok" 2>/dev/null || true
 fi
 
+# Chown startup files created by the upstream installer in the remote user's home
+if id -u "$REMOTE_USER" >/dev/null 2>&1 && [[ "$REMOTE_USER" != "root" ]]; then
+    chown -R "$REMOTE_USER:" "$REMOTE_USER_HOME/.grok" 2>/dev/null || true
+    for rcfile in "$REMOTE_USER_HOME/.bashrc" "$REMOTE_USER_HOME/.zshrc" "$REMOTE_USER_HOME/.profile"; do
+        if [[ -e "$rcfile" ]]; then
+            chown "$REMOTE_USER:" "$rcfile" 2>/dev/null || true
+        fi
+    done
+fi
+
 # Locate the installed binary and link it to /usr/local/bin
 GROK_BIN="$(command -v grok || true)"
 if [[ -z "$GROK_BIN" ]]; then

@@ -35,7 +35,7 @@ done
 
 # Link the cursor binary itself, guarding against self-link
 CURSOR_BIN="$REMOTE_USER_HOME/.local/bin/cursor"
-if [[ -n "$CURSOR_BIN" && "$CURSOR_BIN" != "/usr/local/bin/cursor" ]]; then
+if [[ -n "$CURSOR_BIN" && -x "$CURSOR_BIN" && "$CURSOR_BIN" != "/usr/local/bin/cursor" ]]; then
     ln -sf "$CURSOR_BIN" /usr/local/bin/cursor
 fi
 
@@ -51,7 +51,7 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
             mv "$REMOTE_USER_HOME/.cursor" "$AGENT_DIR/legacy-cursor"
         fi
         rm -f "$REMOTE_USER_HOME/.cursor"
-        su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$REMOTE_USER_HOME/.cursor'"
+        su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$REMOTE_USER_HOME/.cursor'" 2>/dev/null || true
     fi
 
     # Only export CURSOR_CONFIG_DIR when shareConfig is enabled

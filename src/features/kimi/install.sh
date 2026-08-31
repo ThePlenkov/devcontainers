@@ -50,19 +50,20 @@ if [[ "$SHARE_CONFIG" == "true" ]]; then
     fi
 
     if [[ -d "$REMOTE_USER_HOME" ]]; then
-        target="$REMOTE_USER_HOME/.kimi"
-        if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
-            mv "$target" "$AGENT_DIR/config-legacy"
-        fi
-        parent=$(dirname "$target")
-        mkdir -p "$parent"
-        rm -f "$target"
-        if id -u "$REMOTE_USER" >/dev/null 2>&1; then
-            chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
-            su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
-        else
-            ln -sfn "$AGENT_DIR" "$target"
-        fi
+        for target in "$REMOTE_USER_HOME/.kimi" "$REMOTE_USER_HOME/.kimi-code"; do
+            if [[ -e "$target" ]] && [[ ! -L "$target" ]]; then
+                mv "$target" "$AGENT_DIR/config-legacy"
+            fi
+            parent=$(dirname "$target")
+            mkdir -p "$parent"
+            rm -f "$target"
+            if id -u "$REMOTE_USER" >/dev/null 2>&1; then
+                chown "$REMOTE_USER:" "$parent" 2>/dev/null || true
+                su -s /bin/bash - "$REMOTE_USER" -c "ln -sfn '$AGENT_DIR' '$target'"
+            else
+                ln -sfn "$AGENT_DIR" "$target"
+            fi
+        done
     fi
     echo "Kimi Code configured to use shared config at $AGENT_DIR"
 fi

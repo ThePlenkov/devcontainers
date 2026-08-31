@@ -94,6 +94,18 @@ mkdir -p /usr/local/lib/docker/cli-plugins
 ln -sf /usr/local/bin/docker-agent /usr/local/lib/docker/cli-plugins/docker-agent
 echo "Docker Agent CLI plugin linked to $DOCKER_CLI_PLUGINS_DIR/docker-agent"
 
+# Clean up old symlinks from previous always-on shareConfig behavior
+if [[ "$SHARE_CONFIG" != "true" ]]; then
+    for old_target in "$REMOTE_USER_HOME/.config/cagent" "$REMOTE_USER_HOME/.cagent"; do
+        if [[ -L "$old_target" ]]; then
+            link_dest=$(readlink "$old_target" 2>/dev/null || true)
+            if [[ "$link_dest" == "$AGENT_DIR" ]]; then
+                rm -f "$old_target"
+            fi
+        fi
+    done
+fi
+
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then
     echo "shareConfig: linking ~/.config/cagent to $AGENT_DIR"

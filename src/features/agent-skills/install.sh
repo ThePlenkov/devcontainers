@@ -161,7 +161,7 @@ if [ ! -f "\$LOCK_FILE" ]; then
     echo "agent-skills: installing skills via gh (first run)..."
     mkdir -p "\$AGENTS_DIR"
     for repo in \$SKILLS_REPOS; do
-      gh skill install "\$repo" --scope user --all --force 2>/dev/null || \\
+      gh skill install "\$repo" --dir "\$SKILLS_DIR" --all --force 2>/dev/null || \\
         echo "agent-skills: failed to install \$repo (skipping)"
     done
     # Mark as done — don't retry every login even if some repos failed

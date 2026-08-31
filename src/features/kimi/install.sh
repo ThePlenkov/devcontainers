@@ -43,7 +43,7 @@ echo "Kimi Code CLI linked to /usr/local/bin/kimi"
 
 # Share config via AGENT_CONFIG_DIR when shareConfig is enabled
 if [[ "$SHARE_CONFIG" == "true" ]]; then
-    echo "shareConfig: linking ~/.kimi to $AGENT_DIR"
+    echo "shareConfig: linking ~/.kimi-code to $AGENT_DIR"
     mkdir -p "$AGENT_DIR"
     if id -u "$REMOTE_USER" >/dev/null 2>&1; then
         chown -R "$REMOTE_USER:" "$AGENT_DIR"

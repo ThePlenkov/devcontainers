@@ -27,6 +27,10 @@ else
     echo "Warning: Bob Shell installation completed but 'bob' command not found at $NPM_GLOBAL_BIN/bob" >&2
 fi
 
+if [[ -n "$NPM_GLOBAL_BIN" && -x "$NPM_GLOBAL_BIN/bob" && "$NPM_GLOBAL_BIN/bob" != "/usr/local/bin/bob" ]]; then
+    ln -sf "$NPM_GLOBAL_BIN/bob" /usr/local/bin/bob
+fi
+
 # Shared agent config for Bob
 if [[ "$SHARE_CONFIG" == "true" ]]; then
     mkdir -p "$AGENT_DIR"

@@ -62,7 +62,7 @@ EOF
 else
     # shareConfig is false — remove any pre-existing profile.d script
     # so CURSOR_CONFIG_DIR is not set unconditionally.
-    if [[ -f /etc/profile.d/cursor.sh ]] && grep -q "cursor.*AGENT_CONFIG_DIR\|cursor.*AGENT_DIR\|Cursor.*feature" /etc/profile.d/cursor.sh 2>/dev/null; then
+    if [[ -f /etc/profile.d/cursor.sh ]] && grep -q "CURSOR_CONFIG_DIR\|cursor.*AGENT_DIR\|Cursor.*feature" /etc/profile.d/cursor.sh 2>/dev/null; then
         rm -f /etc/profile.d/cursor.sh
     fi
 

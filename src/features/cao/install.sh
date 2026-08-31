@@ -60,6 +60,8 @@ fi
 
 # Install CAO via uv tool install
 # With UV_INSTALL_DIR=/usr/local, uv tools are installed to /usr/local/bin
+export UV_TOOL_DIR="/usr/local/share/uv/tools"
+export UV_TOOL_BIN_DIR="/usr/local/bin"
 uv tool install "git+https://github.com/awslabs/cli-agent-orchestrator.git@${CAO_REF}" --force
 
 # Locate the installed binary and link it to /usr/local/bin

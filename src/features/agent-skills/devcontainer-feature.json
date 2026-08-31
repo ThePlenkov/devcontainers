@@ -1,8 +1,8 @@
 {
   "id": "agent-skills",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Agent Skills",
-  "description": "Install agent skills globally from GitHub repositories using npx skills or gh skill. Supports multiple skill packages, installer selection, and agent targeting.",
+  "description": "Install agent skills at runtime using existing gh auth. Ships a sync script (profile.d) that installs skills from GitHub repos on first login and creates per-agent symlinks. No token needed — uses the gh auth already on the PVC. Public skills are also installed at build time as a fallback.",
   "documentationURL": "https://github.com/docker-x/devcontainers#agent-skills",
   "keywords": [
     "ai",
@@ -16,28 +16,28 @@
   "options": {
     "installer": {
       "type": "string",
-      "default": "auto",
-      "description": "Skill installer: 'auto' (detect per-repo), 'npx' (skills CLI), or 'gh' (gh skill)"
+      "default": "gh",
+      "description": "Skill installer: 'gh' (gh skill, default), 'npx' (skills CLI), or 'auto' (gh first)"
     },
     "skills": {
       "type": "string",
       "default": "",
-      "description": "Comma-separated list of skill packages (GitHub repos) to install globally"
+      "description": "Comma-separated list of skill packages (GitHub repos) to install"
     },
     "agents": {
       "type": "string",
       "default": "*",
-      "description": "Comma-separated agent names to install skills for (e.g. 'devin,claude,codex'). Default '*' = all detected agents"
+      "description": "Comma-separated agent names to create symlinks for (e.g. 'devin,claude-code,codex'). Default '*' = all known agents"
     },
-    "scope": {
+    "token": {
       "type": "string",
-      "default": "home",
-      "description": "Install scope: 'home' (global, ~/.agents/skills/) or 'project' (./.agents/skills/)"
+      "default": "",
+      "description": "GitHub token for private repo access. Falls back to $GH_TOKEN / $GITHUB_TOKEN env vars."
     },
     "copy": {
       "type": "boolean",
       "default": true,
-      "description": "Copy skill files instead of symlinking (recommended for npx/bunx transient caches)"
+      "description": "Copy skill files instead of symlinking (used by npx installer only)"
     }
   },
   "dependsOn": {
@@ -46,6 +46,8 @@
     "ghcr.io/devcontainers/features/github-cli": {}
   },
   "installsAfter": [
-    "ghcr.io/devcontainers/features/common-utils"
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/github-cli",
+    "ghcr.io/devcontainers/features/node"
   ]
 }

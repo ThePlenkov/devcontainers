@@ -108,7 +108,24 @@ install_gascity() {
     local tmpdir; tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' RETURN
     curl --proto =https --proto-redir =https -fsSL "$url" -o "$tmpdir/$asset"
-    echo "Warning: No checksums published by upstream. Skipping SHA-256 verification." >&2
+    # Verify checksum (gascity publishes gascity_<ver>_checksums.txt)
+    local checksum_url="https://github.com/gastownhall/gascity/releases/download/${tag}/gascity_${ver_no_v}_checksums.txt"
+    if curl --proto =https --proto-redir =https -fsSL "$checksum_url" -o "$tmpdir/checksums.txt" 2>/dev/null; then
+        local expected_sha; expected_sha="$(grep "  ${asset}$" "$tmpdir/checksums.txt" | awk '{print $1}')"
+        if [[ -n "$expected_sha" ]]; then
+            local actual_sha; actual_sha="$(sha256sum "$tmpdir/$asset" | awk '{print $1}')"
+            if [[ "$actual_sha" != "$expected_sha" ]]; then
+                echo "Error: SHA-256 mismatch for $asset" >&2
+                exit 1
+            fi
+            echo "Checksum verified for $asset"
+        else
+            echo "Error: $asset not found in checksums.txt" >&2
+            exit 1
+        fi
+    else
+        echo "Warning: Could not download checksums.txt. Skipping SHA-256 verification." >&2
+    fi
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
     if [[ ! -f "$tmpdir/gc" ]]; then
@@ -171,7 +188,24 @@ install_beads() {
     local tmpdir; tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' RETURN
     curl --proto =https --proto-redir =https -fsSL "$url" -o "$tmpdir/$asset"
-    echo "Warning: No checksums published by upstream. Skipping SHA-256 verification." >&2
+    # Verify checksum (beads publishes checksums.txt)
+    local checksum_url="https://github.com/gastownhall/beads/releases/download/${tag}/checksums.txt"
+    if curl --proto =https --proto-redir =https -fsSL "$checksum_url" -o "$tmpdir/checksums.txt" 2>/dev/null; then
+        local expected_sha; expected_sha="$(grep "  ${asset}$" "$tmpdir/checksums.txt" | awk '{print $1}')"
+        if [[ -n "$expected_sha" ]]; then
+            local actual_sha; actual_sha="$(sha256sum "$tmpdir/$asset" | awk '{print $1}')"
+            if [[ "$actual_sha" != "$expected_sha" ]]; then
+                echo "Error: SHA-256 mismatch for $asset" >&2
+                exit 1
+            fi
+            echo "Checksum verified for $asset"
+        else
+            echo "Error: $asset not found in checksums.txt" >&2
+            exit 1
+        fi
+    else
+        echo "Warning: Could not download checksums.txt. Skipping SHA-256 verification." >&2
+    fi
     tar -xzf "$tmpdir/$asset" -C "$tmpdir"
 
     # beads tarball layout: either ./bd or ./bin/bd
